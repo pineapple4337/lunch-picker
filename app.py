@@ -5,7 +5,7 @@ import random
 # =====================================================================
 # 1. MOBILE-FIRST UI LAYOUT & CUSTOM CSS STYLING
 # =====================================================================
-st.set_page_config(page_title="Funan Food Radar", page_icon="🍟", layout="centered")
+st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered")
 
 # Inject clean sans-serif typography, vibrant colors, mobile cards, and custom slider CSS
 st.markdown("""
@@ -119,8 +119,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="app-title">🍟 Funan Crew Radar</p>', unsafe_allow_html=True)
-st.markdown('<p class="app-subtitle">Built for mobile layout grids. Zero hardcoded bypasses.</p>', unsafe_allow_html=True)
+st.markdown('<p class="app-title">🍟 lunch picker</p>', unsafe_allow_html=True)
+st.markdown('<p class="app-subtitle">what to eat!!!.</p>', unsafe_allow_html=True)
 
 # =====================================================================
 # 2. KEY INTEGRATION & CONSTANTS
@@ -165,7 +165,7 @@ if "executed_vibe" not in st.session_state:
 # =====================================================================
 # 3. MOBILE INTERACTIVE CONTROLS
 # =====================================================================
-st.write("### 🎯 Step 1: Pick the Vibe")
+st.write("### 🎯 step 1: any cravings?")
 
 # Generate base culinary choices from our translation map dictionary headers
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
@@ -190,7 +190,7 @@ max_allowed_price = price_map[price_tier[1]]
 # =====================================================================
 # 4. LOGICAL AREA TEXT SEARCH WITH DYNAMIC CATEGORY PICKER
 # =====================================================================
-if st.button("📡 Scan Building Blueprint", use_container_width=True):
+if st.button("📡 search!", use_container_width=True):
     with st.spinner("Analyzing building registry..."):
         
         url = "https://places.googleapis.com/v1/places:searchText"

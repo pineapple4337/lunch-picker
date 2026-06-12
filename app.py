@@ -260,7 +260,7 @@ if st.button("📡 search!", use_container_width=True):
                     tags.add("Casual Dining")
                     
                 is_open = p.get("regularOpeningHours", {}).get("openNow", None)
-                status = "🟢 OPEN NOW" if is_open else "⚪ CLOSED/UNKNOWN"
+                status = "🟢 open!" if is_open else "⚪ closed/unknown"
                 
                 processed_list.append({
                     "name": name,

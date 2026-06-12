@@ -10,11 +10,6 @@ st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered
 
 st.markdown("""
     <style>
-        /* changes the main app backgrounds completely to soft pink */
-        .stApp, div[data-testid="stAppViewContainer"], div[data-testid="stHeader"] {
-            background-color: #fff0f5 !important;
-        }
-        
         /* Global typography and soft dark pink/grey text */
         html, body, [data-testid="stWidgetLabel"] p {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;

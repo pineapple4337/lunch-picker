@@ -15,8 +15,12 @@ else:
     st.stop()
 
 # Funan Coordinates
-FUNAN_LAT = 1.2913
-FUNAN_LNG = 103.8499
+        FUNAN_LAT = 1.2913
+        FUNAN_LNG = 103.8499
+        
+        # Convert max_distance slider (meters) to rough latitude/longitude degrees 
+        # 111,000 meters is roughly 1 degree of latitude
+        lat_lng_delta = max_distance / 111000.0
 
 # 3. Sidebar Filters
 st.sidebar.header("Filters")
@@ -50,15 +54,19 @@ if st.button("Find Food Options 🎯"):
         text_query = f"{cuisine} food" if cuisine else "fast casual food arcade stall restaurant"
         
         payload = {
-            "textQuery": text_query,
-            # FIX 1: Change Bias to Restriction so Google is forced to look inside the specified radius
+            "textQuery": f"{cuisine} food" if cuisine else "fast casual food arcade stall restaurant",
             "locationRestriction": {
-                "circle": {
-                    "center": {"latitude": FUNAN_LAT, "longitude": FUNAN_LNG},
-                    "radius": float(max_distance)
+                "rectangle": {
+                    "low": {
+                        "latitude": FUNAN_LAT - lat_lng_delta,
+                        "longitude": FUNAN_LNG - lat_lng_delta
+                    },
+                    "high": {
+                        "latitude": FUNAN_LAT + lat_lng_delta,
+                        "longitude": FUNAN_LNG + lat_lng_delta
+                    }
                 }
             },
-            # FIX 2: Pass price levels directly to the API endpoint to filter at the database level
             "priceLevels": selected_prices
         }
         

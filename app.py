@@ -220,6 +220,9 @@ price_tier = st.select_slider(
     value=("$", "$$")
 )
 
+# Fix: Secure max_distance variable declaration in the main execution thread
+max_distance = st.sidebar.slider("Scan Radius (meters)", min_value=50, max_value=1000, value=300, step=50)
+
 # Convert display price choices to match Google API pricing strings
 price_map = {"$": 1, "$$": 2, "$$$": 3, "$$$$": 4}
 max_allowed_price = price_map[price_tier[1]]
@@ -243,17 +246,19 @@ if st.button("📡 Scan Building Blueprint", use_container_width=True):
         if selected_vibe != "Show All Options":
             search_string = f"{selected_vibe.lower()} joints in funan singapore"
             
+        # Fail-safe protection mapping to eliminate NameError scope boundaries
+        search_radius = float(max_distance) if 'max_distance' in locals() else 300.0
+            
         # The officially supported payload layout for Google v1/places:searchText
         payload = {
             "textQuery": search_string,
-            # Biases results heavily toward Funan's coordinates using an official V1 circle object
             "locationBias": {
                 "circle": {
                     "center": {
                         "latitude": FUNAN_LAT, 
                         "longitude": FUNAN_LNG
                     },
-                    "radius": float(max_distance)
+                    "radius": search_radius
                 }
             }
         }

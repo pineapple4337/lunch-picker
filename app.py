@@ -177,9 +177,10 @@ if st.button("📡 search!", use_container_width=True):
         st.session_state.executed_vibe = target_vibe
         clean_vibe_name = target_vibe.split('  ')[0]
         
-        # Look for general options within the target area context
-        search_string = f"{clean_vibe_name} food near {starting_point.lower()} singapore"
-            
+        # 🛡️ Fallback fix: If empty, explicitly force "funan mall" into the query string
+        base_location = starting_point if starting_point else "funan mall"
+        search_string = f"{clean_vibe_name} food near {base_location.lower()} singapore"
+        
         payload = {
             "textQuery": search_string,
             "locationBias": {

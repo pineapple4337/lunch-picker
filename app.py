@@ -7,7 +7,7 @@ import pandas as pd
 # =====================================================================
 st.set_page_config(page_title="Funan Food Picker", page_icon="🍔", layout="centered")
 st.title("🍔 Funan Food Picker")
-st.write("Find where to eat with your office crew using the modern Places API!")
+st.write("Find where to eat with your office crew using the modern Nearby Radar!")
 
 # =====================================================================
 # 2. SAFELY FETCH API KEY FROM STREAMLIT SECRETS
@@ -18,17 +18,23 @@ else:
     st.error("Please configure your GOOGLE_API_KEY in Streamlit secrets.")
     st.stop()
 
-# Static Funan Baseline Coordinates
+# Static Funan Coordinates
 FUNAN_LAT = 1.2913
 FUNAN_LNG = 103.8499
 
 # =====================================================================
-# 3. SIDEBAR FILTERS (Instantiated FIRST so variables exist)
+# 3. SIDEBAR FILTERS
 # =====================================================================
 st.sidebar.header("Filters")
 
-cuisine = st.sidebar.text_input("Cuisine Type (e.g., Japanese, Mexican, Cafe)", value="")
-max_distance = st.sidebar.slider("Max Walking Distance (meters)", min_value=100, max_value=2000, value=300, step=100)
+# Dropdown choices to map to Google's strict type fields instead of messy text queries
+cuisine_type = st.sidebar.selectbox(
+    "Establishment Category",
+    options=["All Food Places", "Fast Food Only", "Cafes & Bakeries", "Standard Restaurants"]
+)
+
+max_distance = st.sidebar.slider("Max Distance (meters)", min_value=50, max_value=800, value=200, step=50)
+
 price_tier = st.sidebar.select_slider(
     "Price Range",
     options=["$", "$$", "$$$", "$$$$"],
@@ -43,47 +49,45 @@ price_map = {
     "$$$$": "PRICE_LEVEL_VERY_EXPENSIVE"
 }
 selected_prices = [key for key in price_map if price_tier[0] <= key <= price_tier[1]]
-google_price_levels = [price_map[tier] for tier in selected_prices]
-
-# Calculate geometric delta AFTER max_distance slider variable is defined
-# Ensure a minimum safety radius of roughly 150m so search doesn't collapse to 0
-search_radius = max(max_distance, 150)
-lat_lng_delta = search_radius / 111000.0
+allowed_google_tiers = [price_map[tier] for tier in selected_prices] + ["PRICE_LEVEL_UNSPECIFIED"]
 
 # =====================================================================
-# 4. FETCH DATA TRIGGER
+# 4. FETCH DATA TRIGGER (USING NEARBY SEARCH)
 # =====================================================================
 if st.button("Find Food Options 🎯"):
-    with st.spinner("Searching for options inside Funan..."):
+    with st.spinner("Scanning Funan perimeter layer by layer..."):
         
-        url = "https://places.googleapis.com/v1/places:searchText"
+        # Switched to the dedicated nearbySearch endpoint
+        url = "https://places.googleapis.com/v1/places:searchNearby"
         
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": API_KEY,
-            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours"
+            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.primaryType"
         }
         
-        # FIX 1: Use a broad fallback keyword if no cuisine is entered so it catches cafes, stalls, and bakeries
-        text_query = f"{cuisine} food" if cuisine else "food eatery restaurant"
-        
+        # Determine strict category filters based on selection
+        # These are official Google classification tags that catch tiny basement stalls easily
+        if cuisine_type == "Fast Food Only":
+            included_types = ["fast_food_restaurant"]
+        elif cuisine_type == "Cafes & Bakeries":
+            included_types = ["cafe", "bakery", "coffee_shop"]
+        elif cuisine_type == "Standard Restaurants":
+            included_types = ["restaurant"]
+        else:
+            # Broad sweeping catch-all for general lunch runs
+            included_types = ["restaurant", "food", "fast_food_restaurant", "cafe", "bakery"]
+            
         payload = {
-            "textQuery": text_query,
+            "includedTypes": included_types,
             "locationRestriction": {
-                "rectangle": {
-                    "low": {
-                        "latitude": FUNAN_LAT - lat_lng_delta,
-                        "longitude": FUNAN_LNG - lat_lng_delta
-                    },
-                    "high": {
-                        "latitude": FUNAN_LAT + lat_lng_delta,
-                        "longitude": FUNAN_LNG + lat_lng_delta
-                    }
+                "circle": {
+                    "center": {"latitude": FUNAN_LAT, "longitude": FUNAN_LNG},
+                    "radius": float(max_distance)
                 }
             },
-            # FIX 2: Request the maximum number of results Google allows per page (max is 20)
-            "pageSize": 20
-            # Note: We removed "priceLevels" from here to prevent Google from dropping unspecified stalls
+            "maxResultCount": 20,
+            "rankPreference": "DISTANCE" # Forces Google to prioritize immediate proximity over global fame
         }
         
         response = requests.post(url, json=payload, headers=headers)
@@ -96,7 +100,7 @@ if st.button("Find Food Options 🎯"):
         results = data.get("places", [])
         
         if not results:
-            st.warning("No spots found matching those settings. Try increasing your distance slider!")
+            st.warning("No registered food spots caught on radar. Try broadening the distance slider slightly!")
         else:
             food_places = []
             for place in results:
@@ -108,8 +112,6 @@ if st.button("Find Food Options 🎯"):
                 status = "open now" if is_open else "closed/unknown"
                 
                 raw_price = place.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
-                
-                # Convert Google API values to user-facing display strings
                 price_icon_map = {
                     "PRICE_LEVEL_INEXPENSIVE": "$", 
                     "PRICE_LEVEL_MODERATE": "$$", 
@@ -127,20 +129,15 @@ if st.button("Find Food Options 🎯"):
                     "status": status
                 })
                 
-            # Create the initial DataFrame
+            # Load into DataFrame and process local filters
             df = pd.DataFrame(food_places)
             
-            # FIX 3: Filter by price in Python instead of Google's database.
-            # We keep a place if it explicitly matches your chosen tiers OR if its price tier is 'unspecified'
-            # This protects small fast-casual kiosks/basement stalls from disappearing!
-            allowed_google_tiers = google_price_levels + ["PRICE_LEVEL_UNSPECIFIED"]
+            # Keep items if they are within selected price levels OR unspecified (basement stalls)
             df = df[df['raw_price_level'].isin(allowed_google_tiers)]
-            
-            # Drop the raw helper column before displaying to users
             df = df.drop(columns=['raw_price_level'])
             
             if df.empty:
-                st.warning("Found options nearby, but they were filtered out by your current price range selection.")
+                st.warning("Places were found nearby, but they were filtered out by your current price range selections.")
                 st.stop()
             
             # Highlight random pick

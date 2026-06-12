@@ -26,7 +26,7 @@ st.markdown("""
         }
         
         .app-subtitle {
-            color: #e695aa;
+            color: #fff0f1;
             font-size: 14px;
             font-weight: 400;
             text-align: center;

@@ -4,25 +4,23 @@ import random
 import math
 
 # =====================================================================
-# 1. MOBILE-FIRST UI LAYOUT & MUTED PASTEL CSS STYLING
+# 1. MOBILE-FIRST UI LAYOUT & CRISP PASTEL CSS STYLING
 # =====================================================================
 st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered")
 
 st.markdown("""
     <style>
-        /* Global soothing light background and soft typography */
-        html, body, [data-testid="stWidgetLabel"] p {
+        /* Global soothing text and clean typography */
+        html, body, [data-testid=\"stWidgetLabel\"] p {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             color: #4a4e69 !important;
         }
         
-        /* Muted Lavender to Blush Pink soft pastel gradient */
+        /* Clean solid pastel purple title */
         .app-title {
             font-size: 34px !important;
             font-weight: 700 !important;
-            background: linear-gradient(135deg, #b79ced, #fbc4ab);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #b79ced !important;
             margin-bottom: 0px;
             text-align: center;
         }
@@ -36,28 +34,27 @@ st.markdown("""
             letter-spacing: 0.5px;
         }
         
-        /* 🎨 DULLED PASTEL SLIDER CONTROLS */
-        div[data-testid="stSlider"] [data-handle="true"] {
+        /* 🎨 CLEAN PASTEL SLIDER */
+        div[data-testid=\"stSlider\"] [data-handle="true"] {
             background-color: #c8b6ff !important;
             border: 2px solid #ffffff !important;
-            box-shadow: 0px 2px 5px rgba(200, 182, 255, 0.5) !important;
+            box-shadow: 0px 2px 5px rgba(200, 182, 255, 0.4) !important;
             border-radius: 50% !important;
             width: 18px !important;
             height: 18px !important;
             top: -1px !important;
         }
         
-        div[data-testid="stSlider"] [data-testid="stSliderTooltip"] {
+        div[data-testid=\"stSlider\"] [data-testid=\"stSliderTooltip\"] {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
         }
         
-        /* Ultra-soft Cream/Lavender Tag Pills */
+        /* Matte grey/purple lowercase tags */
         .tag-pill {
             display: inline-block;
-            background-color: #f0efa640; /* soft touch tint */
-            background: #e8e8e4;
+            background-color: #e8e8e4;
             color: #6d597a;
             padding: 3px 10px;
             border-radius: 20px;
@@ -69,40 +66,52 @@ st.markdown("""
             border: 1px solid #d8e2dc;
         }
         
-        /* Soft Milk-Tea/Blush Highlight Box for Randomizer Winner */
+        /* Solid soft blush pink box for choice winner */
         .winner-box {
-            background: linear-gradient(135deg, #fceade 0%, #f3eae8 100%);
-            border: 2px dashed #e8aeac;
-            border-radius: 16px;
+            background-color: #fff0f1;
+            border: 1px solid #ffccd5;
+            border-radius: 12px;
             padding: 22px;
             margin-bottom: 24px;
             text-align: center;
         }
         
-        /* Low contrast matte cards for individual search elements */
-        div[data-testid="stExpander"] {
+        /* Low contrast matte cards for search items */
+        div[data-testid=\"stExpander\"] {
             background-color: #ffffff !important;
             border: 1px solid #f0efeb !important;
             border-radius: 12px !important;
-            box-shadow: 0 2px 8px rgba(216, 226, 220, 0.3) !important;
+            box-shadow: 0 2px 8px rgba(216, 226, 220, 0.2) !important;
             margin-bottom: 8px !important;
         }
         
-        /* Softer, non-glary action buttons */
-        .stButton>button {
-            background: linear-gradient(135deg, #e8aeac, #b8c0ff) !important;
-            color: #4a4e69 !important;
-            border: none !important;
+        /* 🛠️ INDIVIDUAL SOLID COLORS FOR BUTTONS */
+        
+        /* Button 1: Main Search (Solid Soft Lavender) */
+        div.stButton > button:first-child, 
+        div[data-testid=\"stFormSubmitButton\"] > button {
+            background-color: #e8dff5 !important;
+            color: #6d597a !important;
+            border: 1px solid #dcd1eb !important;
             padding: 10px 20px !important;
             border-radius: 10px !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
-            box-shadow: 0 2px 4px rgba(184, 192, 255, 0.2) !important;
+            width: 100%;
+        }
+        
+        /* Button 2: Random Selection (Solid Soft Pink) */
+        div.stBlock:has(div.winner-box) + div.stButton > button,
+        .stButton:nth-of-type(2) > button, 
+        div[data-testid=\"element-container\"] + div.stButton > button {
+            background-color: #fce1e4 !important;
+            color: #c97a8e !important;
+            border: 1px solid #f9ccd2 !important;
         }
         
         .stButton>button:hover {
             transform: translateY(-1px) !important;
-            box-shadow: 0 4px 10px rgba(184, 192, 255, 0.4) !important;
+            opacity: 0.9 !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -143,10 +152,9 @@ def get_custom_coordinates(location_query):
     return 1.2913, 103.8499
 
 def calculate_haversine_distance(lat1, lon1, lat2, lon2):
-    """computes the absolute straight-line walking distance in meters completely for free"""
     if not lat1 or not lon1 or not lat2 or not lon2:
         return 0
-    radius = 6371000 # earth radius in metres
+    radius = 6371000
     
     d_lat = math.radians(lat2 - lat1)
     d_lon = math.radians(lon2 - lon1)
@@ -156,7 +164,6 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return int(radius * c)
 
-# Google API Tag Translation Matrix
 GOOGLE_TYPE_TRANSLATOR = {
     "japanese_restaurant": "japanese  🍣 🍜 🍱", "sushi_restaurant": "japanese  🍣 🍜 🍱", "ramen_restaurant": "japanese  🍣 🍜 🍱",
     "tonkatsu_restaurant": "japanese  🍣 🍜 🍱", "japanese_curry_restaurant": "japanese  🍣 🍜 🍱", "japanese_izakaya_restaurant": "japanese  🍣 🍜 🍱",
@@ -228,7 +235,6 @@ if st.button("📡 search!", use_container_width=True):
         st.session_state.executed_vibe = target_vibe
         clean_vibe_name = target_vibe.split('  ')[0]
         
-        # Fallback tracking control line
         base_location = starting_point if starting_point else "funan mall"
         search_string = f"{clean_vibe_name} food near {base_location.lower()} singapore"
         

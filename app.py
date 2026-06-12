@@ -131,26 +131,26 @@ FUNAN_LAT, FUNAN_LNG = 1.2913, 103.8499
 
 # The Comprehensive Google API V1 to SG-Crew Tag Translation Matrix
 GOOGLE_TYPE_TRANSLATOR = {
-    "japanese 🍣 🍜 🍱_restaurant": "japanese 🍣 🍜 🍱", "sushi_restaurant": "japanese 🍣 🍜 🍱", "ramen_restaurant": "japanese 🍣 🍜 🍱",
-    "tonkatsu_restaurant": "japanese 🍣 🍜 🍱", "japanese 🍣 🍜 🍱_curry_restaurant": "japanese 🍣 🍜 🍱", "japanese 🍣 🍜 🍱_izakaya_restaurant": "japanese 🍣 🍜 🍱",
+    "japanese_restaurant": "japanese 🍣 🍜 🍱", "sushi_restaurant": "japanese 🍣 🍜 🍱", "ramen_restaurant": "japanese 🍣 🍜 🍱",
+    "tonkatsu_restaurant": "japanese 🍣 🍜 🍱", "japanese_curry_restaurant": "japanese 🍣 🍜 🍱", "japanese_izakaya_restaurant": "japanese 🍣 🍜 🍱",
     "yakiniku_restaurant": "japanese 🍣 🍜 🍱", "yakitori_restaurant": "japanese 🍣 🍜 🍱",
-    "korean_restaurant": "korean", "korean_barbecue_restaurant": "korean",
-    "thai_restaurant": "thai / SE asian", "vietnamese_restaurant": "thai / SE asian", "cambodian_restaurant": "thai / SE asian",
-    "indonesian_restaurant": "thai / SE asian", "malaysian_restaurant": "thai / SE asian", "burmese_restaurant": "thai / SE asian", "filipino_restaurant": "thai / SE asian",
-    "chinese_restaurant": "chinese", "cantonese_restaurant": "chinese", "dim_sum_restaurant": "chinese",
-    "dumpling_restaurant": "chinese", "chinese_noodle_restaurant": "chinese", "noodle_shop": "chinese",
-    "hot_pot_restaurant": "chinese", "taiwanese_restaurant": "chinese", "soup_restaurant": "chinese",
+    "korean_restaurant": "korean 🇰🇷 🍲 🥢", "korean_barbecue_restaurant": "korean 🇰🇷 🍲 🥢",
+    "thai_restaurant": "thai / SE asian 🍛 🦐 🥘", "vietnamese_restaurant": "thai / SE asian 🍛 🦐 🥘", "cambodian_restaurant": "thai / SE asian 🍛 🦐 🥘",
+    "indonesian_restaurant": "thai / SE asian 🍛 🦐 🥘", "malaysian_restaurant": "thai / SE asian 🍛 🦐 🥘", "burmese_restaurant": "thai / SE asian 🍛 🦐 🥘", "filipino_restaurant": "thai / SE asian 🍛 🦐 🥘",
+    "chinese_restaurant": "chinese 🥟 🍜 🥡", "cantonese_restaurant": "chinese 🥟 🍜 🥡", "dim_sum_restaurant": "chinese 🥟 🍜 🥡",
+    "dumpling_restaurant": "chinese 🥟 🍜 🥡", "chinese_noodle_restaurant": "chinese 🥟 🍜 🥡", "noodle_shop": "chinese 🥟 🍜 🥡",
+    "hot_pot_restaurant": "chinese 🥟 🍜 🥡", "taiwanese_restaurant": "chinese 🥟 🍜 🥡", "soup_restaurant": "chinese 🥟 🍜 🥡",
     "fast_food_restaurant": "fast food 🍟 🍔 🍗", "meal_takeaway": "fast food 🍟 🍔 🍗", "hamburger_restaurant": "fast food 🍟 🍔 🍗",
     "chicken_restaurant": "fast food 🍟 🍔 🍗", "chicken_wings_restaurant": "fast food 🍟 🍔 🍗", "hot_dog_restaurant": "fast food 🍟 🍔 🍗",
     "sandwich_shop": "fast food 🍟 🍔 🍗", "snack_bar": "fast food 🍟 🍔 🍗", "burrito_restaurant": "fast food 🍟 🍔 🍗", "taco_restaurant": "fast food 🍟 🍔 🍗",
-    "western_restaurant": "western", "steak_house": "western", "pizza_restaurant": "western", "bar_and_grill": "western",
-    "american_restaurant": "western", "italian_restaurant": "western", "french_restaurant": "western",
-    "spanish_restaurant": "western", "mediterranean_restaurant": "western", "european_restaurant": "western", "bistro": "western", "diner": "western",
-    "cafe": "cafe & snacks", "coffee_shop": "cafe & snacks", "coffee_roastery": "cafe & snacks", "coffee_stand": "cafe & snacks",
-    "tea_house": "cafe & snacks", "juice_shop": "cafe & snacks", "acai_shop": "cafe & snacks", "cafeteria": "cafe & snacks",
-    "bakery": "cafe & snacks", "cake_shop": "cafe & snacks", "pastry_shop": "cafe & snacks", "dessert_restaurant": "cafe & snacks",
-    "dessert_shop": "cafe & snacks", "ice_cream_shop": "cafe & snacks", "donut_shop": "cafe & snacks", "chocolate_shop": "cafe & snacks", "confectionery": "cafe & snacks",
-    "vegan_restaurant": "vegetarian / vegan", "vegetarian_restaurant": "vegetarian / vegan", "salad_shop": "vegetarian / vegan"
+    "western_restaurant": "western 🍕 🥩 🍝", "steak_house": "western 🍕 🥩 🍝", "pizza_restaurant": "western 🍕 🥩 🍝", "bar_and_grill": "western 🍕 🥩 🍝",
+    "american_restaurant": "western 🍕 🥩 🍝", "italian_restaurant": "western 🍕 🥩 🍝", "french_restaurant": "western 🍕 🥩 🍝",
+    "spanish_restaurant": "western 🍕 🥩 🍝", "mediterranean_restaurant": "western 🍕 🥩 🍝", "european_restaurant": "western 🍕 🥩 🍝", "bistro": "western 🍕 🥩 🍝", "diner": "western 🍕 🥩 🍝",
+    "cafe": "cafe & snacks 🧋 🍩 🍵", "coffee_shop": "cafe & snacks 🧋 🍩 🍵", "coffee_roastery": "cafe & snacks 🧋 🍩 🍵", "coffee_stand": "cafe & snacks 🧋 🍩 🍵",
+    "tea_house": "cafe & snacks 🧋 🍩 🍵", "juice_shop": "cafe & snacks 🧋 🍩 🍵", "acai_shop": "cafe & snacks 🧋 🍩 🍵", "cafeteria": "cafe & snacks 🧋 🍩 🍵",
+    "bakery": "cafe & snacks 🧋 🍩 🍵", "cake_shop": "cafe & snacks 🧋 🍩 🍵", "pastry_shop": "cafe & snacks 🧋 🍩 🍵", "dessert_restaurant": "cafe & snacks 🧋 🍩 🍵",
+    "dessert_shop": "cafe & snacks 🧋 🍩 🍵", "ice_cream_shop": "cafe & snacks 🧋 🍩 🍵", "donut_shop": "cafe & snacks 🧋 🍩 🍵", "chocolate_shop": "cafe & snacks 🧋 🍩 🍵", "confectionery": "cafe & snacks 🧋 🍩 🍵",
+    "vegan_restaurant": "vegetarian / vegan 🥗 🥑 🥦", "vegetarian_restaurant": "vegetarian / vegan 🥗 🥑 🥦", "salad_shop": "vegetarian / vegan 🥗 🥑 🥦"
 }
 
 if "radar_matches" not in st.session_state:

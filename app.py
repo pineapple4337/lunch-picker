@@ -127,7 +127,30 @@ else:
     st.error("Missing GOOGLE_API_KEY in secrets configuration.")
     st.stop()
 
-FUNAN_LAT, FUNAN_LNG = 1.2913, 103.8499
+# =====================================================================
+# 3. HELPER FUNCTION: GEOLOCATION ROUTER
+# =====================================================================
+def get_custom_coordinates(location_query):
+    """resolves custom text entries into clear coordinate pairs via google api v1"""
+    geo_url = "https://places.googleapis.com/v1/places:searchText"
+    geo_headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": API_KEY,
+        "X-Goog-FieldMask": "places.location"
+    }
+    geo_payload = {"textQuery": f"{location_query} singapore"}
+    
+    try:
+        geo_resp = requests.post(geo_url, json=geo_payload, headers=geo_headers, timeout=5.0)
+        if geo_resp.status_code == 200:
+            places_found = geo_resp.json().get("places", [])
+            if places_found:
+                loc = places_found[0].get("location", {})
+                return loc.get("latitude"), loc.get("longitude")
+    except Exception:
+        pass
+    # fallback default coordinates if network or query fails
+    return 1.2913, 103.8499
 
 # The Comprehensive Google API V1 to SG-Crew Tag Translation Matrix
 GOOGLE_TYPE_TRANSLATOR = {
@@ -159,17 +182,18 @@ if "executed_vibe" not in st.session_state:
     st.session_state.executed_vibe = ""
 
 # =====================================================================
-# 3. MOBILE INTERACTIVE CONTROLS
+# 4. MOBILE INTERACTIVE CONTROLS
 # =====================================================================
-st.write("### 🎯 step 1: any cravings?")
+st.write("### 📍 step 1: where you at?")
+# New text field input allowing on-the-fly custom geolocation mapping entries
+starting_point = st.text_input("enter current base (e.g. funan, bugis mrt, clarke quay)", value="funan mall").strip()
+
+st.write("### 🎯 step 2: any cravings?")
 
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
-
-# Kept entirely in lowercase to match your dropdown style seamlessly
 dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
 
-# Expanded upper bound parameter to 1600m to natively capture 2 MRT stops out
 max_distance = st.sidebar.slider("scan radius (metres)", min_value=50, max_value=1600, value=300, step=50)
 
 price_tier = st.select_slider(
@@ -182,10 +206,13 @@ price_map = {"$": 1, "$$": 2, "$$$": 3, "$$$$": 4}
 max_allowed_price = price_map[price_tier[1]]
 
 # =====================================================================
-# 4. LOGICAL AREA TEXT SEARCH WITH DYNAMIC CATEGORY PICKER
+# 5. LOGICAL AREA TEXT SEARCH WITH DYNAMIC GEOLOCATION PIPELINE
 # =====================================================================
 if st.button("📡 search!", use_container_width=True):
     with st.spinner("Analyzing building registry..."):
+        
+        # Call our helper module to dynamically lookup the target coordinates
+        target_lat, target_lng = get_custom_coordinates(starting_point if starting_point else "funan mall")
         
         url = "https://places.googleapis.com/v1/places:searchText"
         headers = {
@@ -194,7 +221,6 @@ if st.button("📡 search!", use_container_width=True):
             "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types"
         }
         
-        # Fixed Case-Sensitivity Bug: Aligned verification string to use perfect lowercase matching
         if selected_vibe == "🎲 surprise me! (random category)":
             target_vibe = random.choice(unique_display_tags)
         else:
@@ -202,23 +228,22 @@ if st.button("📡 search!", use_container_width=True):
             
         st.session_state.executed_vibe = target_vibe
         
-        # Smart Bounding Strategy: Shifts query keyword target area context when radius grows
         search_radius = float(max_distance) if 'max_distance' in locals() else 300.0
+        clean_vibe_name = target_vibe.split('  ')[0]
         
+        # Adaptive tracking text query formatting based on what the user types
         if search_radius > 400.0:
-            # Casts a wide net into the surrounding area grids (up to 2 MRT stops out)
-            search_string = f"{target_vibe.split('  ')[0]} food in downtown core singapore"
+            search_string = f"{clean_vibe_name} food near {starting_point.lower()} singapore"
         else:
-            # Keeps focus deeply isolated inside Funan's structure for short walks
-            search_string = f"{target_vibe.split('  ')[0]} joints in funan singapore"
+            search_string = f"{clean_vibe_name} joints in {starting_point.lower()} singapore"
             
         payload = {
             "textQuery": search_string,
             "locationBias": {
                 "circle": {
                     "center": {
-                        "latitude": FUNAN_LAT, 
-                        "longitude": FUNAN_LNG
+                        "latitude": target_lat, 
+                        "longitude": target_lng
                     },
                     "radius": search_radius
                 }
@@ -233,7 +258,7 @@ if st.button("📡 search!", use_container_width=True):
             
             for p in places:
                 name = p.get("displayName", {}).get("text", "Unknown")
-                address = p.get("formattedAddress", "Funan Mall")
+                address = p.get("formattedAddress", "Singapore")
                 rating = p.get("rating", "N/A")
                 
                 raw_price_level = p.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
@@ -284,7 +309,7 @@ if st.button("📡 search!", use_container_width=True):
             st.error(f"API Engine Error: {response.text}")
 
 # =====================================================================
-# 5. MOBILE RENDERING LAYER (CARDS & RANDOMIZER)
+# 6. MOBILE RENDERING LAYER (CARDS & RANDOMIZER)
 # =====================================================================
 if st.session_state.radar_matches is not None:
     st.write("---")

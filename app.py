@@ -4,20 +4,22 @@ import random
 import math
 
 # =====================================================================
-# 1. STYLING
+# 1. MOBILE-FIRST UI LAYOUT & PASTEL PINK-PURPLE CSS STYLING
 # =====================================================================
 st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered")
 
 st.markdown("""
     <style>
+        /* Force clean sans-serif typography across the app */
         html, body, [data-testid="stWidgetLabel"] p {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
         
+        /* Pastel Pink to Purple gradient title */
         .app-title {
-            font-size: 32px !important;
+            font-size: 34px !important;
             font-weight: 800 !important;
-            background: linear-gradient(45deg, #FF4B4B, #FF8333);
+            background: linear-gradient(135deg, #ec4899, #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0px;
@@ -25,32 +27,80 @@ st.markdown("""
         }
         
         .app-subtitle {
-            color: #666666;
+            color: #8b5cf6;
             font-size: 14px;
+            font-weight: 500;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
         }
         
+        /* 🎨 CUSTOM PASTEL SLIDER & SELECTION CONTROLS */
+        div[data-testid="stSlider"] [data-handle="true"] {
+            background-color: #a855f7 !important;
+            border: 2px solid #ffffff !important;
+            box-shadow: 0px 2px 6px rgba(168, 85, 247, 0.4) !important;
+            border-radius: 50% !important;
+            width: 20px !important;
+            height: 20px !important;
+            top: -2px !important;
+        }
+        
+        div[data-testid="stSlider"] [data-testid="stSliderTooltip"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+        }
+        
+        /* Pastel Pink/Purple Tag Pills */
         .tag-pill {
             display: inline-block;
-            background-color: #f1f5f9;
-            color: #475569;
-            padding: 2px 8px;
-            border-radius: 4px;
+            background-color: #f3e8ff;
+            color: #6b21a8;
+            padding: 3px 10px;
+            border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
-            margin-right: 4px;
-            margin-bottom: 4px;
+            margin-right: 5px;
+            margin-bottom: 5px;
             text-transform: lowercase;
+            border: 1px solid #e9d5ff;
         }
         
+        /* Soft Pastel Pink/Purple Highlight Box for Randomizer Winner */
         .winner-box {
-            background: linear-gradient(135deg, #fff5f5 0%, #fff0ea 100%);
-            border: 2px solid #ff4b4b;
-            border-radius: 166px;
-            padding: 20px;
+            background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%);
+            border: 2px dashed #ec4899;
+            border-radius: 16px;
+            padding: 22px;
             margin-bottom: 24px;
             text-align: center;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.05);
+        }
+        
+        /* Style adjustments for Streamlit's container widgets */
+        div[data-testid="stExpander"] {
+            background-color: #ffffff !important;
+            border: 1px solid #fae8ff !important;
+            border-radius: 10px !important;
+            box-shadow: 0 2px 4px rgba(243, 232, 255, 0.3) !important;
+            margin-bottom: 8px !important;
+        }
+        
+        /* Styled buttons matching the palette */
+        .stButton>button {
+            background: linear-gradient(135deg, #f472b6, #c084fc) !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 20px !important;
+            border-radius: 10px !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .stButton>button:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(192, 132, 252, 0.4) !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -68,7 +118,7 @@ else:
     st.stop()
 
 # =====================================================================
-# 3. UTILITY MODULES; GEOMATH
+# 3. UTILITY MODULES: GEOMATH ENGINE
 # =====================================================================
 def get_custom_coordinates(location_query):
     geo_url = "https://places.googleapis.com/v1/places:searchText"
@@ -137,7 +187,7 @@ if "executed_vibe" not in st.session_state:
 # 4. MOBILE INTERACTIVE CONTROLS
 # =====================================================================
 st.write("### 📍 step 1: where u?")
-starting_point = st.text_input("enter current location (e.g. bugis, chinatown). default = funan!", value="funan mall").strip()
+starting_point = st.text_input("enter current location (e.g. bugis, chinatown)", placeholder="funan mall").strip()
 
 st.write("### 🎯 step 2: any cravings?")
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
@@ -165,7 +215,6 @@ if st.button("📡 search!", use_container_width=True):
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": API_KEY,
-            # Added places.location here so Google gives us the coordinates for math calculation
             "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types,places.location"
         }
         
@@ -177,7 +226,7 @@ if st.button("📡 search!", use_container_width=True):
         st.session_state.executed_vibe = target_vibe
         clean_vibe_name = target_vibe.split('  ')[0]
         
-        # 🛡️ Fallback fix: If empty, explicitly force "funan mall" into the query string
+        # 🛡️ Fallback fix to protect coordinate boundary integrity
         base_location = starting_point if starting_point else "funan mall"
         search_string = f"{clean_vibe_name} food near {base_location.lower()} singapore"
         
@@ -246,7 +295,7 @@ if st.button("📡 search!", use_container_width=True):
                     "address": address,
                     "status": status,
                     "tags": list(tags),
-                    "distance": meters_away # safe to state database entry
+                    "distance": meters_away
                 })
             
             filtered_list = []
@@ -257,7 +306,7 @@ if st.button("📡 search!", use_container_width=True):
                     continue
                 filtered_list.append(item)
                 
-            # 🔥 MAGIC HAPPENS HERE: Sort the list so the absolute closest spot is index 0
+            # Sort the list so the absolute closest spot is index 0
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
                 
             st.session_state.radar_matches = filtered_list
@@ -279,33 +328,33 @@ if st.session_state.radar_matches is not None:
             
             st.markdown(f"""
                 <div class="winner-box">
-                    <p style="color: #FF4B4B; font-weight: 800; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">🎰 chosen option!</p>
-                    <p class="restaurant-name" style="font-size: 24px !important;">{winner['name']}</p>
+                    <p style="color: #ec4899; font-weight: 800; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">🔮 chosen option!</p>
+                    <p class="restaurant-name" style="font-size: 24px !important; color: #4c1d95;">{winner['name']}</p>
                     <p style="margin: 8px 0;">{tag_pills}</p>
-                    <p style="font-size: 14px; color: #333333; margin: 0;"><b>dist:</b> {winner['distance']}m away | <b>rating:</b> {winner['rating']} ⭐</p>
-                    <p style="font-size: 12px; color: #666666; margin-top: 6px;">{winner['status']}</p>
+                    <p style="font-size: 14px; color: #5b21b6; margin: 0;"><b>dist:</b> {winner['distance']}m away | <b>rating:</b> {winner['rating']} ⭐</p>
+                    <p style="font-size: 12px; color: #701a75; margin-top: 6px;">{winner['status']}</p>
                 </div>
             """, unsafe_allow_html=True)
             
-        st.markdown(f'<h3 style="font-size: 20px; font-weight: bold; margin-bottom: 15px;">📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})</h3>', unsafe_allow_html=True)
+        st.markdown(f'<h3 style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #6b21a8;">📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})</h3>', unsafe_allow_html=True)
         
         for spot in st.session_state.radar_matches:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
             
-            # Formatted headers to explicitly print out distance right away (e.g., 🥞 Funan Sushi | 120m | 4.5 ⭐)
-            expander_title = f"🥞 {spot['name'].title()}  |  🚶 {spot['distance']}m  |  {spot['rating']} ⭐"
+            # Formatted headers to explicitly print out distance right away
+            expander_title = f"✨ {spot['name'].title()}  |  🚶 {spot['distance']}m  |  {spot['rating']} ⭐"
             
             with st.expander(expander_title):
                 st.markdown(f"""
                     <div style="padding: 5px 0px;">
-                        <p style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
+                        <p style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
                             <b>budget:</b> {spot['price_tier']} | <b>status:</b> {spot['status']}
                         </p>
                         <div style="margin-bottom: 12px;">
                             {pills_html}
                         </div>
-                        <div style="background-color: #f8fafc; border-left: 3px solid #ff4b4b; padding: 10px; border-radius: 6px;">
-                            <p style="font-size: 12px; color: #334155; margin: 0; font-family: monospace;">
+                        <div style="background-color: #faf5ff; border-left: 3px solid #d8b4fe; padding: 10px; border-radius: 6px;">
+                            <p style="font-size: 12px; color: #5b21b6; margin: 0; font-family: monospace;">
                                 📍 {spot['address'].lower()}
                             </p>
                         </div>

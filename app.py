@@ -311,21 +311,26 @@ if st.session_state.radar_matches is not None:
             
         st.markdown(f'<h3 style="font-size: 20px; font-weight: bold; margin-bottom: 15px;">📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})</h3>', unsafe_allow_html=True)
         
-        # Loop over filtered list and render beautiful responsive vertical card modules
+        # Loop over filtered list and render interactive mobile dropdown modules
         for spot in st.session_state.radar_matches:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
             
-            st.markdown(f"""
-                <div class="food-card">
-                    <div class="card-header">
-                        <p class="restaurant-name">{spot['name']}</p>
-                        <span class="rating-badge">{spot['rating']} ⭐</span>
+            # Use an expander header that looks exactly like your clean card title layout
+            expander_title = f"🥞 {spot['name'].title()}  |  {spot['rating']} ⭐"
+            
+            with st.expander(expander_title):
+                st.markdown(f"""
+                    <div style="padding: 5px 0px;">
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
+                            <b>budget:</b> {spot['price_tier']} | <b>status:</b> {spot['status']}
+                        </p>
+                        <div style="margin-bottom: 12px;">
+                            {pills_html}
+                        </div>
+                        <div style="background-color: #f8fafc; border-left: 3px solid #ff4b4b; padding: 10px; border-radius: 6px;">
+                            <p style="font-size: 12px; color: #334155; margin: 0; font-family: monospace;">
+                                📍 {spot['address'].lower()}
+                            </p>
+                        </div>
                     </div>
-                    <div class="card-meta">
-                        <b>Price:</b> {spot['price_tier']} | {spot['status']}
-                    </div>
-                    <div>
-                        {pills_html}
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)

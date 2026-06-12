@@ -112,7 +112,8 @@ PRICE_ICON_MAP = {
 # =====================================================================
 st.sidebar.header("Radar Configuration")
 
-max_distance = st.sidebar.slider("Scan Radius (meters)", min_value=50, max_value=500, value=300, step=50)
+# Increased max_value to 1000 to allow a 1km search radius perimeter
+max_distance = st.sidebar.slider("Scan Radius (meters)", min_value=50, max_value=1000, value=300, step=50)
 
 price_tier = st.sidebar.select_slider(
     "Max Budget Tier",

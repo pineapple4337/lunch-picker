@@ -67,7 +67,7 @@ if st.button("Find Food Options 🎯"):
         }
         
         # Determine strict category filters based on selection
-        # These are official Google classification tags that catch tiny basement stalls easily
+        # Note: 'food' is omitted because Google rejects it as an unsupported search parameter
         if cuisine_type == "Fast Food Only":
             included_types = ["fast_food_restaurant"]
         elif cuisine_type == "Cafes & Bakeries":
@@ -75,9 +75,9 @@ if st.button("Find Food Options 🎯"):
         elif cuisine_type == "Standard Restaurants":
             included_types = ["restaurant"]
         else:
-            # Broad sweeping catch-all for general lunch runs
-            included_types = ["restaurant", "food", "fast_food_restaurant", "cafe", "bakery"]
-            
+            # Broad sweeping catch-all for general lunch runs using ONLY official supported parameters
+            included_types = ["restaurant", "fast_food_restaurant", "cafe", "bakery", "meal_takeaway"]
+        
         payload = {
             "includedTypes": included_types,
             "locationRestriction": {

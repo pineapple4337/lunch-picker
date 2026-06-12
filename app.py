@@ -4,7 +4,7 @@ import random
 import math
 
 # =====================================================================
-# 1. MOBILE-FIRST UI LAYOUT & CUSTOM CSS STYLING
+# 1. STYLING
 # =====================================================================
 st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered")
 
@@ -68,7 +68,7 @@ else:
     st.stop()
 
 # =====================================================================
-# 3. UTILITY MODULES: FREE GEOMATH PROFILERS
+# 3. UTILITY MODULES; GEOMATH
 # =====================================================================
 def get_custom_coordinates(location_query):
     geo_url = "https://places.googleapis.com/v1/places:searchText"
@@ -104,7 +104,7 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return int(radius * c)
 
-# The Comprehensive Google API V1 to SG-Crew Tag Translation Matrix
+# Google API Tag Translation Matrix
 GOOGLE_TYPE_TRANSLATOR = {
     "japanese_restaurant": "japanese  🍣 🍜 🍱", "sushi_restaurant": "japanese  🍣 🍜 🍱", "ramen_restaurant": "japanese  🍣 🍜 🍱",
     "tonkatsu_restaurant": "japanese  🍣 🍜 🍱", "japanese_curry_restaurant": "japanese  🍣 🍜 🍱", "japanese_izakaya_restaurant": "japanese  🍣 🍜 🍱",
@@ -265,7 +265,7 @@ if st.button("📡 search!", use_container_width=True):
             st.error(f"API Engine Error: {response.text}")
 
 # =====================================================================
-# 6. MOBILE RENDERING LAYER (CARDS & RANDOMIZER)
+# 6. MOBILE RENDERING LAYER (CARDS & RANDOMISER)
 # =====================================================================
 if st.session_state.radar_matches is not None:
     st.write("---")

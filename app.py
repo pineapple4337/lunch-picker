@@ -42,15 +42,19 @@ if st.button("Find Food Options 🎯"):
         search_query = f"{cuisine} food restaurant" if cuisine else "food restaurant"
         
         # Call Google Places API
-        places_result = gmaps.places_nearby(
-            location=(FUNAN_LAT, FUNAN_LNG),
-            radius=max_distance,
-            keyword=search_query,
-            type="restaurant",
-            min_price=min_price_num,
-            max_price=max_price_num
-        )
-        
+        try:
+            places_result = gmaps.places_nearby(
+                location=(FUNAN_LAT, FUNAN_LNG),
+                radius=max_distance,
+                keyword=search_query,
+                type="restaurant",
+                min_price=min_price_num,
+                max_price=max_price_num
+            )
+        except googlemaps.exceptions.ApiError as e:
+            st.error(f"Google API Error: {e}")
+            st.stop()
+            
         results = places_result.get("results", [])
         
         if not results:

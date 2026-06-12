@@ -346,21 +346,25 @@ if st.button("📡 Scan Perimeter Using Selected Filters"):
 
                 if not tags:
                     tags.add("Other Casual Meals")
-
-                food_places.append(
-                    {
-                        "name": name,
-                        "rating": rating,
-                        "price_tier": PRICE_ICON_MAP.get(
-                            raw_price,
-                            "unspecified"
-                        ),
-                        "raw_price_level": raw_price,
-                        "address": address,
-                        "status": status,
-                        "tags": list(tags)
-                    }
-                )
+                
+                # 🌟 THE STEAKHOUSE FILTER PATCH:
+                # If Google hasn't assigned a price tier yet, but explicitly classifies the 
+                # venue structural type as a steakhouse or fine dining, force its price tier high 
+                # so it gets caught by your budget slider!
+                if raw_price == "PRICE_LEVEL_UNSPECIFIED":
+                    premium_types = ["steak_house", "fine_dining_restaurant", "bar_and_grill"]
+                    if any(p_type in google_types for p_type in premium_types):
+                        raw_price = "PRICE_LEVEL_EXPENSIVE" # Force it to $$$ internally
+                
+                food_places.append({
+                    "name": name,
+                    "rating": rating,
+                    "price_tier": PRICE_ICON_MAP.get(raw_price, "unspecified"),
+                    "raw_price_level": raw_price,
+                    "address": address,
+                    "status": status,
+                    "tags": list(tags)
+                })
 
             df = (
                 pd.DataFrame(food_places)

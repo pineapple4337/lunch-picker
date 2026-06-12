@@ -131,9 +131,9 @@ FUNAN_LAT, FUNAN_LNG = 1.2913, 103.8499
 
 # The Comprehensive Google API V1 to SG-Crew Tag Translation Matrix
 GOOGLE_TYPE_TRANSLATOR = {
-    "japanese_restaurant": "japanese 🍣 🍜 🍱", "sushi_restaurant": "japanese 🍣 🍜 🍱", "ramen_restaurant": "japanese 🍣 🍜 🍱",
-    "tonkatsu_restaurant": "japanese 🍣 🍜 🍱", "japanese_curry_restaurant": "japanese 🍣 🍜 🍱", "japanese_izakaya_restaurant": "japanese 🍣 🍜 🍱",
-    "yakiniku_restaurant": "japanese 🍣 🍜 🍱", "yakitori_restaurant": "japanese 🍣 🍜 🍱",
+    "japanese_restaurant": "japanese  🍣 🍜 🍱", "sushi_restaurant": "japanese  🍣 🍜 🍱", "ramen_restaurant": "japanese  🍣 🍜 🍱",
+    "tonkatsu_restaurant": "japanese  🍣 🍜 🍱", "japanese_curry_restaurant": "japanese  🍣 🍜 🍱", "japanese_izakaya_restaurant": "japanese  🍣 🍜 🍱",
+    "yakiniku_restaurant": "japanese  🍣 🍜 🍱", "yakitori_restaurant": "japanese  🍣 🍜 🍱",
     "korean_restaurant": "korean 🇰🇷 🍲 🥢", "korean_barbecue_restaurant": "korean 🇰🇷 🍲 🥢",
     "thai_restaurant": "thai / SE asian 🍛 🦐 🥘", "vietnamese_restaurant": "thai / SE asian 🍛 🦐 🥘", "cambodian_restaurant": "thai / SE asian 🍛 🦐 🥘",
     "indonesian_restaurant": "thai / SE asian 🍛 🦐 🥘", "malaysian_restaurant": "thai / SE asian 🍛 🦐 🥘", "burmese_restaurant": "thai / SE asian 🍛 🦐 🥘", "filipino_restaurant": "thai / SE asian 🍛 🦐 🥘",

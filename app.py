@@ -313,7 +313,7 @@ if st.session_state.radar_matches is not None:
                 </div>
             """, unsafe_allow_html=True)
             
-        st.write(f"### 📋 {st.session_state.executed_vibe} Results ({len(st.session_state.radar_matches)})")
+        st.write(f"### 📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})")
         
         # Loop over filtered list and render beautiful responsive vertical card modules
         for spot in st.session_state.radar_matches:

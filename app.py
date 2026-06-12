@@ -120,7 +120,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<p class="app-title">🍟 lunch picker</p>', unsafe_allow_html=True)
-st.markdown('<p class="app-subtitle">what to eat!!!.</p>', unsafe_allow_html=True)
+st.markdown('<p class="app-subtitle">what to eat!!!</p>', unsafe_allow_html=True)
 
 # =====================================================================
 # 2. KEY INTEGRATION & CONSTANTS
@@ -135,25 +135,25 @@ FUNAN_LAT, FUNAN_LNG = 1.2913, 103.8499
 
 # The Comprehensive Google API V1 to SG-Crew Tag Translation Matrix
 GOOGLE_TYPE_TRANSLATOR = {
-    "japanese_restaurant": "Japanese", "sushi_restaurant": "Japanese", "ramen_restaurant": "Japanese",
-    "tonkatsu_restaurant": "Japanese", "japanese_curry_restaurant": "Japanese", "japanese_izakaya_restaurant": "Japanese",
-    "yakiniku_restaurant": "Japanese", "yakitori_restaurant": "Japanese",
-    "korean_restaurant": "Korean", "korean_barbecue_restaurant": "Korean",
-    "thai_restaurant": "Thai / SE Asian", "vietnamese_restaurant": "Thai / SE Asian", "cambodian_restaurant": "Thai / SE Asian",
-    "indonesian_restaurant": "Thai / SE Asian", "malaysian_restaurant": "Thai / SE Asian", "burmese_restaurant": "Thai / SE Asian", "filipino_restaurant": "Thai / SE Asian",
-    "chinese_restaurant": "Chinese Mains", "cantonese_restaurant": "Chinese Mains", "dim_sum_restaurant": "Chinese Mains",
-    "dumpling_restaurant": "Chinese Mains", "chinese_noodle_restaurant": "Chinese Mains", "noodle_shop": "Chinese Mains",
-    "hot_pot_restaurant": "Chinese Mains", "taiwanese_restaurant": "Chinese Mains", "soup_restaurant": "Chinese Mains",
-    "fast_food_restaurant": "Fast Food", "meal_takeaway": "Fast Food", "hamburger_restaurant": "Fast Food",
-    "chicken_restaurant": "Fast Food", "chicken_wings_restaurant": "Fast Food", "hot_dog_restaurant": "Fast Food",
-    "sandwich_shop": "Fast Food", "snack_bar": "Fast Food", "burrito_restaurant": "Fast Food", "taco_restaurant": "Fast Food",
-    "western_restaurant": "Western", "steak_house": "Western", "pizza_restaurant": "Western", "bar_and_grill": "Western",
-    "american_restaurant": "Western", "italian_restaurant": "Western", "french_restaurant": "Western",
-    "spanish_restaurant": "Western", "mediterranean_restaurant": "Western", "european_restaurant": "Western", "bistro": "Western", "diner": "Western",
-    "cafe": "Cafe & Snacks", "coffee_shop": "Cafe & Snacks", "coffee_roastery": "Cafe & Snacks", "coffee_stand": "Cafe & Snacks",
-    "tea_house": "Cafe & Snacks", "juice_shop": "Cafe & Snacks", "acai_shop": "Cafe & Snacks", "cafeteria": "Cafe & Snacks",
-    "bakery": "Cafe & Snacks", "cake_shop": "Cafe & Snacks", "pastry_shop": "Cafe & Snacks", "dessert_restaurant": "Cafe & Snacks",
-    "dessert_shop": "Cafe & Snacks", "ice_cream_shop": "Cafe & Snacks", "donut_shop": "Cafe & Snacks", "chocolate_shop": "Cafe & Snacks", "confectionery": "Cafe & Snacks",
+    "japanese_restaurant": "japanese", "sushi_restaurant": "japanese", "ramen_restaurant": "japanese",
+    "tonkatsu_restaurant": "japanese", "japanese_curry_restaurant": "japanese", "japanese_izakaya_restaurant": "japanese",
+    "yakiniku_restaurant": "japanese", "yakitori_restaurant": "japanese",
+    "korean_restaurant": "korean", "korean_barbecue_restaurant": "korean",
+    "thai_restaurant": "thai / SE asian", "vietnamese_restaurant": "thai / SE asian", "cambodian_restaurant": "thai / SE asian",
+    "indonesian_restaurant": "thai / SE asian", "malaysian_restaurant": "thai / SE asian", "burmese_restaurant": "thai / SE asian", "filipino_restaurant": "thai / SE asian",
+    "chinese_restaurant": "chinese", "cantonese_restaurant": "chinese", "dim_sum_restaurant": "chinese",
+    "dumpling_restaurant": "chinese", "chinese_noodle_restaurant": "chinese", "noodle_shop": "chinese",
+    "hot_pot_restaurant": "chinese", "taiwanese_restaurant": "chinese", "soup_restaurant": "chinese",
+    "fast_food_restaurant": "fast food", "meal_takeaway": "fast food", "hamburger_restaurant": "fast food",
+    "chicken_restaurant": "fast food", "chicken_wings_restaurant": "fast food", "hot_dog_restaurant": "fast food",
+    "sandwich_shop": "fast food", "snack_bar": "fast food", "burrito_restaurant": "fast food", "taco_restaurant": "fast food",
+    "western_restaurant": "western", "steak_house": "western", "pizza_restaurant": "western", "bar_and_grill": "western",
+    "american_restaurant": "western", "italian_restaurant": "western", "french_restaurant": "western",
+    "spanish_restaurant": "western", "mediterranean_restaurant": "western", "european_restaurant": "western", "bistro": "western", "diner": "western",
+    "cafe": "cafe & snacks", "coffee_shop": "cafe & snacks", "coffee_roastery": "cafe & snacks", "coffee_stand": "cafe & snacks",
+    "tea_house": "cafe & snacks", "juice_shop": "cafe & snacks", "acai_shop": "cafe & snacks", "cafeteria": "cafe & snacks",
+    "bakery": "cafe & snacks", "cake_shop": "cafe & snacks", "pastry_shop": "cafe & snacks", "dessert_restaurant": "cafe & snacks",
+    "dessert_shop": "cafe & snacks", "ice_cream_shop": "cafe & snacks", "donut_shop": "cafe & snacks", "chocolate_shop": "cafe & snacks", "confectionery": "cafe & snacks",
     "vegan_restaurant": "Vegetarian / Vegan", "vegetarian_restaurant": "Vegetarian / Vegan", "salad_shop": "Vegetarian / Vegan"
 }
 
@@ -172,13 +172,13 @@ unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
 
 # Setup clean options with the new dynamic "Surprise Me" selection function built in
 dropdown_options = unique_display_tags + ["🎲 Surprise Me! (Random Category)"]
-selected_vibe = st.selectbox("What style of meal are we looking for?", options=dropdown_options)
+selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
 
 # Sidebar Max Scan Limit Controller
-max_distance = st.sidebar.slider("Scan Radius (meters)", min_value=50, max_value=1000, value=300, step=50)
+max_distance = st.sidebar.slider("scan radius (metres)", min_value=50, max_value=1000, value=300, step=50)
 
 price_tier = st.select_slider(
-    "Max Budget Target",
+    "max budget range",
     options=["$", "$$", "$$$", "$$$$"],
     value=("$", "$$")
 )
@@ -299,7 +299,7 @@ if st.session_state.radar_matches is not None:
         st.warning(f"No spots matching '{st.session_state.executed_vibe}' found within budget/distance parameters. Try adjusting your sliders!")
     else:
         # Large Mobile-Friendly Randomizer Action Button
-        if st.button("🎲 Roll Random Selection", use_container_width=True):
+        if st.button("🎲 roll random selection", use_container_width=True):
             winner = random.choice(st.session_state.radar_matches)
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
             

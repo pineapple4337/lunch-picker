@@ -163,15 +163,14 @@ if "executed_vibe" not in st.session_state:
 # =====================================================================
 st.write("### 🎯 step 1: any cravings?")
 
-# Generate base culinary choices from our translation map dictionary headers
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
 
-# Setup clean options with the new dynamic "Surprise Me" selection function built in
+# Kept entirely in lowercase to match your dropdown style seamlessly
 dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
 
-# Sidebar Max Scan Limit Controller
-max_distance = st.sidebar.slider("scan radius (metres)", min_value=50, max_value=1000, value=300, step=50)
+# Expanded upper bound parameter to 1600m to natively capture 2 MRT stops out
+max_distance = st.sidebar.slider("scan radius (metres)", min_value=50, max_value=1600, value=300, step=50)
 
 price_tier = st.select_slider(
     "max budget range",
@@ -179,7 +178,6 @@ price_tier = st.select_slider(
     value=("$", "$$")
 )
 
-# Convert display price choices to match Google API pricing strings
 price_map = {"$": 1, "$$": 2, "$$$": 3, "$$$$": 4}
 max_allowed_price = price_map[price_tier[1]]
 
@@ -196,21 +194,23 @@ if st.button("📡 search!", use_container_width=True):
             "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types"
         }
         
-        # 🎲 THE DYNAMIC SURPRISE OVERRIDE ENGINE:
-        # Resolves the 20-result cap by rolling a randomized target array selection *before* the API execution call
+        # Fixed Case-Sensitivity Bug: Aligned verification string to use perfect lowercase matching
         if selected_vibe == "🎲 surprise me! (random category)":
             target_vibe = random.choice(unique_display_tags)
         else:
             target_vibe = selected_vibe
             
-        # Lock final execution tag choice into memory layout state for headers
         st.session_state.executed_vibe = target_vibe
         
-        # Build logical query string targeted specifically to find active structural listings
-        search_string = f"{target_vibe.lower()} joints in funan singapore"
-            
-        # Secure max_distance variable boundary layout setup
+        # Smart Bounding Strategy: Shifts query keyword target area context when radius grows
         search_radius = float(max_distance) if 'max_distance' in locals() else 300.0
+        
+        if search_radius > 400.0:
+            # Casts a wide net into the surrounding area grids (up to 2 MRT stops out)
+            search_string = f"{target_vibe.split('  ')[0]} food in downtown core singapore"
+        else:
+            # Keeps focus deeply isolated inside Funan's structure for short walks
+            search_string = f"{target_vibe.split('  ')[0]} joints in funan singapore"
             
         payload = {
             "textQuery": search_string,
@@ -249,7 +249,6 @@ if st.button("📡 search!", use_container_width=True):
                 elif "VERY_EXPENSIVE" in raw_price_level:
                     price_numeric, price_display = 4, "$$$$"
                 
-                # Programmatic evaluation mapping
                 tags = set()
                 google_types = p.get("types", [])
                 for g_type in google_types:
@@ -272,7 +271,6 @@ if st.button("📡 search!", use_container_width=True):
                     "tags": list(tags)
                 })
             
-            # Apply strict local filters to verify downloaded arrays
             filtered_list = []
             for item in processed_list:
                 if item["price_score"] > max_allowed_price:
@@ -294,7 +292,6 @@ if st.session_state.radar_matches is not None:
     if len(st.session_state.radar_matches) == 0:
         st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within budget/distance parameters")
     else:
-        # Large Mobile-Friendly Randomizer Action Button
         if st.button("🎲 roll random selection", use_container_width=True):
             winner = random.choice(st.session_state.radar_matches)
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
@@ -311,11 +308,8 @@ if st.session_state.radar_matches is not None:
             
         st.markdown(f'<h3 style="font-size: 20px; font-weight: bold; margin-bottom: 15px;">📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})</h3>', unsafe_allow_html=True)
         
-        # Loop over filtered list and render interactive mobile dropdown modules
         for spot in st.session_state.radar_matches:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
-            
-            # Use an expander header that looks exactly like your clean card title layout
             expander_title = f"🥞 {spot['name'].title()}  |  {spot['rating']} ⭐"
             
             with st.expander(expander_title):

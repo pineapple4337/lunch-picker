@@ -154,7 +154,7 @@ GOOGLE_TYPE_TRANSLATOR = {
     "tea_house": "cafe & snacks", "juice_shop": "cafe & snacks", "acai_shop": "cafe & snacks", "cafeteria": "cafe & snacks",
     "bakery": "cafe & snacks", "cake_shop": "cafe & snacks", "pastry_shop": "cafe & snacks", "dessert_restaurant": "cafe & snacks",
     "dessert_shop": "cafe & snacks", "ice_cream_shop": "cafe & snacks", "donut_shop": "cafe & snacks", "chocolate_shop": "cafe & snacks", "confectionery": "cafe & snacks",
-    "vegan_restaurant": "Vegetarian / Vegan", "vegetarian_restaurant": "Vegetarian / Vegan", "salad_shop": "Vegetarian / Vegan"
+    "vegan_restaurant": "vegetarian / vegan", "vegetarian_restaurant": "vegetarian / vegan", "salad_shop": "vegetarian / vegan"
 }
 
 if "radar_matches" not in st.session_state:
@@ -171,7 +171,7 @@ st.write("### 🎯 step 1: any cravings?")
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
 
 # Setup clean options with the new dynamic "Surprise Me" selection function built in
-dropdown_options = unique_display_tags + ["🎲 Surprise Me! (Random Category)"]
+dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
 
 # Sidebar Max Scan Limit Controller

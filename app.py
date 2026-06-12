@@ -61,11 +61,11 @@ if st.button("Find Food Options 🎯"):
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": API_KEY,
-            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.subDestinations"
+            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours"
         }
         
-        # Optimized keyword grouping to surface casual options and basement counters
-        text_query = f"{cuisine} food" if cuisine else "fast casual eatery food court stall restaurant"
+        # FIX 1: Use a broad fallback keyword if no cuisine is entered so it catches cafes, stalls, and bakeries
+        text_query = f"{cuisine} food" if cuisine else "food eatery restaurant"
         
         payload = {
             "textQuery": text_query,
@@ -81,7 +81,9 @@ if st.button("Find Food Options 🎯"):
                     }
                 }
             },
-            "priceLevels": google_price_levels
+            # FIX 2: Request the maximum number of results Google allows per page (max is 20)
+            "pageSize": 20
+            # Note: We removed "priceLevels" from here to prevent Google from dropping unspecified stalls
         }
         
         response = requests.post(url, json=payload, headers=headers)
@@ -94,7 +96,7 @@ if st.button("Find Food Options 🎯"):
         results = data.get("places", [])
         
         if not results:
-            st.warning("No spots found matching those settings. Try increasing your distance slider to pull in adjacent basements!")
+            st.warning("No spots found matching those settings. Try increasing your distance slider!")
         else:
             food_places = []
             for place in results:
@@ -106,28 +108,45 @@ if st.button("Find Food Options 🎯"):
                 status = "open now" if is_open else "closed/unknown"
                 
                 raw_price = place.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
+                
+                # Convert Google API values to user-facing display strings
                 price_icon_map = {
                     "PRICE_LEVEL_INEXPENSIVE": "$", 
                     "PRICE_LEVEL_MODERATE": "$$", 
                     "PRICE_LEVEL_EXPENSIVE": "$$$", 
                     "PRICE_LEVEL_VERY_EXPENSIVE": "$$$$"
                 }
-                price_display = price_icon_map.get(raw_price, "$")
+                price_display = price_icon_map.get(raw_price, "unspecified")
                 
                 food_places.append({
                     "name": name.lower(),
                     "rating": rating,
-                    "price": price_display,
+                    "price_tier": price_display,
+                    "raw_price_level": raw_price,
                     "address": address.lower(),
                     "status": status
                 })
                 
+            # Create the initial DataFrame
             df = pd.DataFrame(food_places)
+            
+            # FIX 3: Filter by price in Python instead of Google's database.
+            # We keep a place if it explicitly matches your chosen tiers OR if its price tier is 'unspecified'
+            # This protects small fast-casual kiosks/basement stalls from disappearing!
+            allowed_google_tiers = google_price_levels + ["PRICE_LEVEL_UNSPECIFIED"]
+            df = df[df['raw_price_level'].isin(allowed_google_tiers)]
+            
+            # Drop the raw helper column before displaying to users
+            df = df.drop(columns=['raw_price_level'])
+            
+            if df.empty:
+                st.warning("Found options nearby, but they were filtered out by your current price range selection.")
+                st.stop()
             
             # Highlight random pick
             st.success("### 🎲 Random Suggestion For Today:")
             random_pick = df.sample(n=1).iloc[0]
-            st.markdown(f"**{random_pick['name'].title()}** — Rating: {random_pick['rating']} ⭐ ({random_pick['price']})")
+            st.markdown(f"**{random_pick['name'].title()}** — Rating: {random_pick['rating']} ⭐ ({random_pick['price_tier']})")
             st.caption(f"📍 {random_pick['address']}")
             
             st.write("---")
@@ -139,7 +158,7 @@ if st.button("Find Food Options 🎯"):
                 column_config={
                     "name": "Restaurant Name",
                     "rating": "Rating ⭐",
-                    "price": "Price Tier",
+                    "price_tier": "Price Tier",
                     "address": "Location / Address",
                     "status": "Status"
                 },

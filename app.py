@@ -238,7 +238,7 @@ if st.button("📡 search!", use_container_width=True):
                 
                 raw_price_level = p.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
                 price_numeric = 0
-                price_display = "n/a 🪙"
+                price_display = "??? 💵"
                 
                 if "INEXPENSIVE" in raw_price_level:
                     price_numeric, price_display = 1, "$"

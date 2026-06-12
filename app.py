@@ -157,7 +157,7 @@ max_allowed_price = price_map[price_tier[1]]
 # 5. LOGICAL AREA TEXT SEARCH WITH DISTANCE CALCULATION
 # =====================================================================
 if st.button("📡 search!", use_container_width=True):
-    with st.spinner("Analyzing building registry..."):
+    with st.spinner("loading..."):
         
         target_lat, target_lng = get_custom_coordinates(starting_point if starting_point else "funan mall")
         

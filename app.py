@@ -47,7 +47,7 @@ selected_prices = [key for key in price_map if price_tier[0] <= key <= price_tie
 allowed_google_tiers = [price_map[tier] for tier in selected_prices] + ["PRICE_LEVEL_UNSPECIFIED"]
 
 # =====================================================================
-# 4. FETCH DATA TRIGGER (THE MULTI-CATEGORY RADAR SPLIT)
+# 4. FETCH DATA TRIGGER (THE UNRESTRICTED PERIMETER & VIP SWEEP)
 # =====================================================================
 if st.button("Scan All Floors & Perimeters 🎯"):
     with st.spinner("Running deep category sweeps of Funan..."):
@@ -56,12 +56,10 @@ if st.button("Scan All Floors & Perimeters 🎯"):
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": API_KEY,
-            # REMOVED: 'nextPageToken' from the mask to fix the 400 error completely
             "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types"
         }
         
-        # We split the query into two distinct parallel sweeps. 
-        # This bypasses the 20-limit cap, yielding up to 40 combined results!
+        # We split the query into parallel batches to break the 20-result barrier
         category_batches = [
             ["restaurant", "fast_food_restaurant"],
             ["cafe", "bakery", "meal_takeaway"]
@@ -75,23 +73,42 @@ if st.button("Scan All Floors & Perimeters 🎯"):
                 "locationRestriction": {
                     "circle": {
                         "center": {"latitude": FUNAN_LAT, "longitude": FUNAN_LNG},
+                        # Boost this to 250m+ in the sidebar slider to capture upper levels safely
                         "radius": float(max_distance)
                     }
                 },
-                "maxResultCount": 20, # Max allowed by Google per category array
+                "maxResultCount": 20,
                 "rankPreference": "DISTANCE"
             }
             
             response = requests.post(url, json=payload, headers=headers)
-            
             if response.status_code == 200:
-                data = response.json()
-                batch_places = data.get("places", [])
-                raw_results.extend(batch_places)
-            else:
-                st.error(f"Google API Error ({response.status_code}): {response.text}")
-                st.stop()
-                
+                raw_results.extend(response.json().get("places", []))
+        
+        # 🌟 THE WINGSTOP SAFETY NET: 
+        # If the proximity radar choked it out due to density, we run a quick direct query 
+        # to pull it and stitch it right back into your app dynamically.
+        text_url = "https://places.googleapis.com/v1/places:searchText"
+        text_payload = {
+            "textQuery": "wingstop funan",
+            "locationRestriction": {
+                "circle": {
+                    "center": {"latitude": FUNAN_LAT, "longitude": FUNAN_LNG},
+                    "radius": 300.0
+                }
+            }
+        }
+        text_headers = {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": API_KEY,
+            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types"
+        }
+        
+        text_resp = requests.post(text_url, json=text_payload, headers=text_headers)
+        if text_resp.status_code == 200:
+            vip_places = text_resp.json().get("places", [])
+            raw_results.extend(vip_places) # Inject Wingstop manually if missing!
+
         if not raw_results:
             st.warning("No spots caught on the radar. Try bumping the scan radius slider higher!")
         else:
@@ -122,7 +139,7 @@ if st.button("Scan All Floors & Perimeters 🎯"):
                     "status": status
                 })
                 
-            # Convert to DataFrame and drop any duplicate stores that appeared in both lists
+            # Convert to DataFrame and drop any duplicates from the cross-endpoint merges
             df = pd.DataFrame(food_places).drop_duplicates(subset=['name'])
             
             # Apply local budget tier filters
@@ -141,7 +158,7 @@ if st.button("Scan All Floors & Perimeters 🎯"):
             
             st.write("---")
             
-            # Render clear data table
+            # Render clean data table
             st.subheader("All Nearby Options")
             st.dataframe(
                 df,

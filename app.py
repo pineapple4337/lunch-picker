@@ -48,7 +48,7 @@ st.markdown("""
         
         /* Changes the filled active bar track color to matching pink */
         div[data-testid="stSlider"] [data-testid="stSliderTrack"] > div > div {
-            background-color: #ffccd5 !important;
+            background-color: #ffffff !important;
         }
         
         /* Hides the default numeric tooltip text blocks over the slider handle */

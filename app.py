@@ -20,7 +20,7 @@ st.markdown("""
         .app-title {
             font-size: 34px !important;
             font-weight: 700 !important;
-            color: #FFD1DC !important;
+            color: #c97a8e !important;
             margin-bottom: 0px;
             text-align: center;
         }

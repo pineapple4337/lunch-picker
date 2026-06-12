@@ -47,53 +47,56 @@ selected_prices = [key for key in price_map if price_tier[0] <= key <= price_tie
 allowed_google_tiers = [price_map[tier] for tier in selected_prices] + ["PRICE_LEVEL_UNSPECIFIED"]
 
 # =====================================================================
-# 4. FETCH DATA TRIGGER (THE ALL-IN-ONE SWEEP)
+# 4. FETCH DATA TRIGGER (THE DEEP MULTI-FLOOR RADAR)
 # =====================================================================
-if st.button("Scan Funan Basements 🎯"):
-    with st.spinner("Running a deep sweep of Funan food listings..."):
+if st.button("Scan All Floors & Perimeters 🎯"):
+    with st.spinner("Running a deep multi-level radar sweep..."):
         
         url = "https://places.googleapis.com/v1/places:searchNearby"
-        
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": API_KEY,
-            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types"
+            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types,nextPageToken"
         }
         
-        # FIX: We query multiple distinct structural categories simultaneously.
-        # This catches standard tables, fast-food lanes, takeaway counters, and bakeries all in one go.
         payload = {
-            "includedTypes": [
-                "restaurant", 
-                "fast_food_restaurant", 
-                "cafe", 
-                "bakery", 
-                "meal_takeaway"
-            ],
+            "includedTypes": ["restaurant", "fast_food_restaurant", "cafe", "bakery", "meal_takeaway"],
             "locationRestriction": {
                 "circle": {
                     "center": {"latitude": FUNAN_LAT, "longitude": FUNAN_LNG},
                     "radius": float(max_distance)
                 }
             },
-            "maxResultCount": 20,
-            "rankPreference": "DISTANCE" # Prioritizes physical location over search optimization algorithms
+            "maxResultCount": 20, # Pull 20 per page loop
+            "rankPreference": "DISTANCE"
         }
         
-        response = requests.post(url, json=payload, headers=headers)
+        all_results = []
         
-        if response.status_code != 200:
-            st.error(f"Google API Error ({response.status_code}): {response.text}")
-            st.stop()
+        # Loop up to 3 times to grab up to 60 options total (clearing out database bottlenecks)
+        for page in range(3):
+            response = requests.post(url, json=payload, headers=headers)
             
-        data = response.json()
-        results = data.get("places", [])
-        
-        if not results:
-            st.warning("No spots caught on the radar. Try bumping the scan radius to 200m or 250m!")
+            if response.status_code != 200:
+                st.error(f"Google API Error ({response.status_code}): {response.text}")
+                st.stop()
+                
+            data = response.json()
+            page_results = data.get("places", [])
+            all_results.extend(page_results)
+            
+            # Check if there are more places further up/out
+            next_token = data.get("nextPageToken")
+            if next_token:
+                payload["pageToken"] = next_token
+            else:
+                break
+                
+        if not all_results:
+            st.warning("No spots caught on the radar. Try bumping the scan radius slider higher!")
         else:
             food_places = []
-            for place in results:
+            for place in all_results:
                 name = place.get("displayName", {}).get("text", "unknown")
                 address = place.get("formattedAddress", "unknown")
                 rating = place.get("rating", "n/a")
@@ -119,9 +122,10 @@ if st.button("Scan Funan Basements 🎯"):
                     "status": status
                 })
                 
-            df = pd.DataFrame(food_places)
+            # Load into DataFrame and eliminate potential pagination duplicates
+            df = pd.DataFrame(food_places).drop_duplicates(subset=['name'])
             
-            # Filter rows against budget constraints via local Pandas logic
+            # Filter rows against budget constraints
             df = df[df['raw_price_level'].isin(allowed_google_tiers)]
             df = df.drop(columns=['raw_price_level'])
             

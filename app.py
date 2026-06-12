@@ -35,31 +35,33 @@ selected_prices = [price_map[key] for key in price_map if price_tier[0] <= key <
 
 # 4. Fetch Data Trigger
 if st.button("Find Food Options 🎯"):
-    with st.spinner("Searching for options near Funan..."):
+    with st.spinner("Searching for options inside Funan..."):
         
-        # New V1 Endpoint URL
         url = "https://places.googleapis.com/v1/places:searchText"
         
-        # Mandatory Headers for the New API (including FieldMask to save costs)
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": API_KEY,
-            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours"
+            # Added targeted fields like subDestinations to catch complex basement mall layouts
+            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.subDestinations"
         }
         
-        # New API Payload Structure
-        text_query = f"{cuisine} restaurant food" if cuisine else "restaurant food"
+        # Broaden keyword search so it picks up basement stalls, fast-casual, and quick-service counters
+        text_query = f"{cuisine} food" if cuisine else "fast casual food arcade stall restaurant"
+        
         payload = {
             "textQuery": text_query,
-            "locationBias": {
+            # FIX 1: Change Bias to Restriction so Google is forced to look inside the specified radius
+            "locationRestriction": {
                 "circle": {
                     "center": {"latitude": FUNAN_LAT, "longitude": FUNAN_LNG},
                     "radius": float(max_distance)
                 }
-            }
+            },
+            # FIX 2: Pass price levels directly to the API endpoint to filter at the database level
+            "priceLevels": selected_prices
         }
         
-        # Send POST request
         response = requests.post(url, json=payload, headers=headers)
         
         if response.status_code != 200:
@@ -70,26 +72,25 @@ if st.button("Find Food Options 🎯"):
         results = data.get("places", [])
         
         if not results:
-            st.warning("No places found matching those specific filters. Try expanding your search!")
+            st.warning("No spots found matching those exact settings. Try increasing your walking distance slider to catch adjacent basement food courts!")
         else:
             food_places = []
             for place in results:
-                # Filter by price manually to guarantee accuracy against text search limits
-                raw_price = place.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
-                if raw_price != "PRICE_LEVEL_UNSPECIFIED" and raw_price not in selected_prices:
-                    continue
-                
                 name = place.get("displayName", {}).get("text", "unknown")
                 address = place.get("formattedAddress", "unknown")
                 rating = place.get("rating", "n/a")
                 
-                # Simplify status display
                 is_open = place.get("regularOpeningHours", {}).get("openNow", None)
                 status = "open now" if is_open else "closed/unknown"
                 
-                # Format price symbols
-                price_icon_map = {"PRICE_LEVEL_INEXPENSIVE": "$", "PRICE_LEVEL_MODERATE": "$$", "PRICE_LEVEL_EXPENSIVE": "$$$", "PRICE_LEVEL_VERY_EXPENSIVE": "$$$$"}
-                price_display = price_icon_map.get(raw_price, "n/a")
+                raw_price = place.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
+                price_icon_map = {
+                    "PRICE_LEVEL_INEXPENSIVE": "$", 
+                    "PRICE_LEVEL_MODERATE": "$$", 
+                    "PRICE_LEVEL_EXPENSIVE": "$$$", 
+                    "PRICE_LEVEL_VERY_EXPENSIVE": "$$$$"
+                }
+                price_display = price_icon_map.get(raw_price, "$") # Default to $ if unrated to avoid hiding casual spots
                 
                 food_places.append({
                     "name": name.lower(),
@@ -98,15 +99,10 @@ if st.button("Find Food Options 🎯"):
                     "address": address.lower(),
                     "status": status
                 })
-            
-            if not food_places:
-                st.warning("Found options nearby, but none matched your exact price range filter.")
-                st.stop()
                 
-            # Convert to DataFrame
             df = pd.DataFrame(food_places)
             
-            # Highlight a random choice
+            # Highlight random pick
             st.success("### 🎲 Random Suggestion For Today:")
             random_pick = df.sample(n=1).iloc[0]
             st.markdown(f"**{random_pick['name'].title()}** — Rating: {random_pick['rating']} ⭐ ({random_pick['price']})")

@@ -100,7 +100,7 @@ st.markdown("""
             font-weight: 600;
             margin-right: 4px;
             margin-bottom: 4px;
-            text-transform: uppercase;
+            text-transform: lowercase;
         }
         
         /* Interactive Highlight Banner for Random Selection */
@@ -301,7 +301,7 @@ if st.session_state.radar_matches is not None:
             
             st.markdown(f"""
                 <div class="winner-box">
-                    <p style="color: #FF4B4B; font-weight: 800; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: uppercase;">🎰 chosen option!</p>
+                    <p style="color: #FF4B4B; font-weight: 800; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">🎰 chosen option!</p>
                     <p class="restaurant-name" style="font-size: 24px !important;">{winner['name']}</p>
                     <p style="margin: 8px 0;">{tag_pills}</p>
                     <p style="font-size: 14px; color: #333333; margin: 0;"><b>rating:</b> {winner['rating']} ⭐ | <b>price:</b> {winner['price_tier']}</p>

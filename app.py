@@ -108,11 +108,9 @@ PRICE_ICON_MAP = {
 }
 
 # =====================================================================
-# 3. SIDEBAR CONFIGURATION
+# 3. INTERACTIVE SEARCH FILTERS (MAIN SCREEN & SIDEBAR)
 # =====================================================================
 st.sidebar.header("Radar Configuration")
-
-# Increased max_value to 1000 to allow a 1km search radius perimeter
 max_distance = st.sidebar.slider("Scan Radius (meters)", min_value=50, max_value=1000, value=300, step=50)
 
 price_tier = st.sidebar.select_slider(
@@ -124,15 +122,37 @@ price_tier = st.sidebar.select_slider(
 selected_prices = [key for key in PRICE_ICON_MAP if PRICE_ICON_MAP[key] in [t for t in PRICE_ICON_MAP if price_tier[0] <= PRICE_ICON_MAP[t] <= price_tier[1]]]
 allowed_google_tiers = selected_prices + ["PRICE_LEVEL_UNSPECIFIED"]
 
+# UI STEP 1: Choose Cuisines BEFORE Searching to prevent the 20-result bottleneck
+st.subheader("🎯 Step 1: Select Your Crew's Cravings")
+
+# Get clean display names from our translator matrix
+available_cuisines = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
+
+selected_tags = st.multiselect(
+    "Select target styles (Leave blank to scan for general meals):",
+    options=available_cuisines,
+    placeholder="e.g., Fast Food, Japanese, Thai / SE Asian"
+)
+
+# Reverse map the user-friendly tags back to official Google API string tokens
+target_google_types = []
+if selected_tags:
+    for g_type, crew_tag in GOOGLE_TYPE_TRANSLATOR.items():
+        if crew_tag in selected_tags:
+            target_google_types.append(g_type)
+else:
+    # Broad default batch if they don't pick anything specific
+    target_google_types = ["restaurant", "fast_food_restaurant", "cafe", "bakery", "meal_takeaway"]
+
 # Initialize session state to hold parsed data across UI interactions
 if "raw_food_df" not in st.session_state:
     st.session_state.raw_food_df = None
 
 # =====================================================================
-# 4. STEP 1: SCAN THE BUILDING (API LAYER)
+# 4. STEP 2: SCAN THE PERIMETER WITH FILTERS APPLIED
 # =====================================================================
-if st.button("📡 Scan All Funan Food Options"):
-    with st.spinner("Sweeping all floors, basements, and perimeters..."):
+if st.button("📡 Scan Perimeter Using Selected Filters"):
+    with st.spinner("Hunting down specific matching spots up to 1km out..."):
         
         url = "https://places.googleapis.com/v1/places:searchNearby"
         headers = {
@@ -141,15 +161,14 @@ if st.button("📡 Scan All Funan Food Options"):
             "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types"
         }
         
-        # Parallel chunked category queries to bypass Google's 20-result ceiling
-        category_batches = [
-            ["restaurant", "fast_food_restaurant"],
-            ["cafe", "bakery", "meal_takeaway"]
-        ]
+        # Split target types into manageable parallel batches to clear the 20-result ceiling
+        # This keeps requests light and maximizes our categorical search depth
+        batch_size = 3
+        type_batches = [target_google_types[i:i + batch_size] for i in range(0, len(target_google_types), batch_size)]
         
         raw_results = []
         
-        for batch in category_batches:
+        for batch in type_batches:
             payload = {
                 "includedTypes": batch,
                 "locationRestriction": {
@@ -166,21 +185,22 @@ if st.button("📡 Scan All Funan Food Options"):
             if response.status_code == 200:
                 raw_results.extend(response.json().get("places", []))
         
-        # 🌟 WINGSTOP EXPLICIT SAFETY STITCHER
-        text_url = "https://places.googleapis.com/v1/places:searchText"
-        text_payload = {
-            "textQuery": "wingstop funan",
-            "locationRestriction": {
-                "circle": {"center": {"latitude": FUNAN_LAT, "longitude": FUNAN_LNG}, "radius": 300.0}
+        # Wingstop target safety stitcher (only triggers if fast food or western filters are relevant)
+        if not selected_tags or any(t in selected_tags for t in ["Fast Food", "Western & Grills"]):
+            text_url = "https://places.googleapis.com/v1/places:searchText"
+            text_payload = {
+                "textQuery": "wingstop funan",
+                "locationRestriction": {
+                    "circle": {"center": {"latitude": FUNAN_LAT, "longitude": FUNAN_LNG}, "radius": 300.0}
+                }
             }
-        }
-        
-        text_resp = requests.post(text_url, json=text_payload, headers=headers)
-        if text_resp.status_code == 200:
-            raw_results.extend(text_resp.json().get("places", []))
+            text_resp = requests.post(text_url, json=text_payload, headers=headers)
+            if text_resp.status_code == 200:
+                raw_results.extend(text_resp.json().get("places", []))
 
         if not raw_results:
-            st.warning("No spots caught on radar. Try expanding your radius.")
+            st.warning("No spots caught on radar with those filters. Try widening your radius slider!")
+            st.session_state.raw_food_df = None
         else:
             food_places = []
             for place in raw_results:
@@ -192,15 +212,13 @@ if st.button("📡 Scan All Funan Food Options"):
                 status = "open now" if is_open else "closed/unknown"
                 raw_price = place.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
                 
-                # Dynamic Clean Tag Parsing via structural Translation Matrix
+                # Tag translation
                 tags = set()
                 google_types = place.get("types", [])
-                
                 for g_type in google_types:
                     if g_type in GOOGLE_TYPE_TRANSLATOR:
                         tags.add(GOOGLE_TYPE_TRANSLATOR[g_type])
                 
-                # Fallback handler for unmapped local classifications or broad restaurant labels
                 if not tags:
                     tags.add("Other Casual Meals")
                 
@@ -214,41 +232,16 @@ if st.button("📡 Scan All Funan Food Options"):
                     "tags": list(tags)
                 })
                 
-            # Convert tracking set to DataFrame, drop duplicates, and apply baseline price thresholds
             df = pd.DataFrame(food_places).drop_duplicates(subset=['name'])
             df = df[df['raw_price_level'].isin(allowed_google_tiers)]
             st.session_state.raw_food_df = df.drop(columns=['raw_price_level'])
 
 # =====================================================================
-# 5. STEP 2: USER REFINEMENT INTERFACE & INTERACTIVE FILTERING
+# 5. STEP 3: RENDER FILTERED RESULTS
 # =====================================================================
 if st.session_state.raw_food_df is not None:
-    st.write("---")
-    st.subheader("🎯 Step 2: Refine Your Crew's Cravings")
-    
-    # Collect a flat sorted list of unique tag titles discovered across the data pool
-    all_tags = sorted(list(set([tag for tags_list in st.session_state.raw_food_df['tags'] for tag in tags_list])))
-    
-    selected_tags = st.multiselect(
-        "Choose tags to search within (Leave blank to see everything scanned):",
-        options=all_tags,
-        placeholder="e.g., Fast Food, Japanese, Western & Grills"
-    )
-    
-    # Dynamically filter local storage frames based on client-side multiselect choices
-    if selected_tags:
-        filtered_df = st.session_state.raw_food_df[
-            st.session_state.raw_food_df['tags'].apply(lambda x: any(t in x for t in selected_tags))
-        ]
-    else:
-        filtered_df = st.session_state.raw_food_df
-
-    if filtered_df.empty:
-        st.warning("No choices match that exact combo of tags. Try removing a filter tag!")
-    else:
-        # Clone layout and clean bracket arrays to printable text format for rendering strings
-        display_df = filtered_df.copy()
-        display_df['tags'] = display_df['tags'].apply(lambda x: ", ".join(x))
+    display_df = st.session_state.raw_food_df.copy()
+    display_df['tags'] = display_df['tags'].apply(lambda x: ", ".join(x))
         
         # =====================================================================
         # 6. STEP 3: THE SELECTION RANDOMIZER

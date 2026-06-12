@@ -2,31 +2,33 @@ import streamlit as st
 import requests
 import pandas as pd
 
-# 1. Setup App Layout & Title
+# =====================================================================
+# 1. SETUP APP LAYOUT & TITLE
+# =====================================================================
 st.set_page_config(page_title="Funan Food Picker", page_icon="🍔", layout="centered")
 st.title("🍔 Funan Food Picker")
 st.write("Find where to eat with your office crew using the modern Places API!")
 
-# 2. Safely Fetch API Key from Streamlit Secrets
+# =====================================================================
+# 2. SAFELY FETCH API KEY FROM STREAMLIT SECRETS
+# =====================================================================
 if "GOOGLE_API_KEY" in st.secrets:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 else:
     st.error("Please configure your GOOGLE_API_KEY in Streamlit secrets.")
     st.stop()
 
-# Funan Coordinates
-        FUNAN_LAT = 1.2913
-        FUNAN_LNG = 103.8499
-        
-        # Convert max_distance slider (meters) to rough latitude/longitude degrees 
-        # 111,000 meters is roughly 1 degree of latitude
-        lat_lng_delta = max_distance / 111000.0
+# Static Funan Baseline Coordinates
+FUNAN_LAT = 1.2913
+FUNAN_LNG = 103.8499
 
-# 3. Sidebar Filters
+# =====================================================================
+# 3. SIDEBAR FILTERS (Instantiated FIRST so variables exist)
+# =====================================================================
 st.sidebar.header("Filters")
 
 cuisine = st.sidebar.text_input("Cuisine Type (e.g., Japanese, Mexican, Cafe)", value="")
-max_distance = st.sidebar.slider("Max Walking Distance (meters)", min_value=100, max_value=2000, value=500, step=100)
+max_distance = st.sidebar.slider("Max Walking Distance (meters)", min_value=100, max_value=2000, value=300, step=100)
 price_tier = st.sidebar.select_slider(
     "Price Range",
     options=["$", "$$", "$$$", "$$$$"],
@@ -34,10 +36,23 @@ price_tier = st.sidebar.select_slider(
 )
 
 # Map price icons to Google V1 Price Levels
-price_map = {"$": "PRICE_LEVEL_INEXPENSIVE", "$$": "PRICE_LEVEL_MODERATE", "$$$": "PRICE_LEVEL_EXPENSIVE", "$$$$": "PRICE_LEVEL_VERY_EXPENSIVE"}
-selected_prices = [price_map[key] for key in price_map if price_tier[0] <= key <= price_tier[1]]
+price_map = {
+    "$": "PRICE_LEVEL_INEXPENSIVE", 
+    "$$": "PRICE_LEVEL_MODERATE", 
+    "$$$": "PRICE_LEVEL_EXPENSIVE", 
+    "$$$$": "PRICE_LEVEL_VERY_EXPENSIVE"
+}
+selected_prices = [key for key in price_map if price_tier[0] <= key <= price_tier[1]]
+google_price_levels = [price_map[tier] for tier in selected_prices]
 
-# 4. Fetch Data Trigger
+# Calculate geometric delta AFTER max_distance slider variable is defined
+# Ensure a minimum safety radius of roughly 150m so search doesn't collapse to 0
+search_radius = max(max_distance, 150)
+lat_lng_delta = search_radius / 111000.0
+
+# =====================================================================
+# 4. FETCH DATA TRIGGER
+# =====================================================================
 if st.button("Find Food Options 🎯"):
     with st.spinner("Searching for options inside Funan..."):
         
@@ -46,15 +61,14 @@ if st.button("Find Food Options 🎯"):
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": API_KEY,
-            # Added targeted fields like subDestinations to catch complex basement mall layouts
             "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.subDestinations"
         }
         
-        # Broaden keyword search so it picks up basement stalls, fast-casual, and quick-service counters
-        text_query = f"{cuisine} food" if cuisine else "fast casual food arcade stall restaurant"
+        # Optimized keyword grouping to surface casual options and basement counters
+        text_query = f"{cuisine} food" if cuisine else "fast casual eatery food court stall restaurant"
         
         payload = {
-            "textQuery": f"{cuisine} food" if cuisine else "fast casual food arcade stall restaurant",
+            "textQuery": text_query,
             "locationRestriction": {
                 "rectangle": {
                     "low": {
@@ -67,7 +81,7 @@ if st.button("Find Food Options 🎯"):
                     }
                 }
             },
-            "priceLevels": selected_prices
+            "priceLevels": google_price_levels
         }
         
         response = requests.post(url, json=payload, headers=headers)
@@ -80,7 +94,7 @@ if st.button("Find Food Options 🎯"):
         results = data.get("places", [])
         
         if not results:
-            st.warning("No spots found matching those exact settings. Try increasing your walking distance slider to catch adjacent basement food courts!")
+            st.warning("No spots found matching those settings. Try increasing your distance slider to pull in adjacent basements!")
         else:
             food_places = []
             for place in results:
@@ -98,7 +112,7 @@ if st.button("Find Food Options 🎯"):
                     "PRICE_LEVEL_EXPENSIVE": "$$$", 
                     "PRICE_LEVEL_VERY_EXPENSIVE": "$$$$"
                 }
-                price_display = price_icon_map.get(raw_price, "$") # Default to $ if unrated to avoid hiding casual spots
+                price_display = price_icon_map.get(raw_price, "$")
                 
                 food_places.append({
                     "name": name.lower(),
@@ -118,7 +132,7 @@ if st.button("Find Food Options 🎯"):
             
             st.write("---")
             
-            # Show all options
+            # Show all options in a table
             st.subheader("All Nearby Options")
             st.dataframe(
                 df,

@@ -292,7 +292,7 @@ if st.session_state.radar_matches is not None:
     st.write("---")
     
     if len(st.session_state.radar_matches) == 0:
-        st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within budget/distance parameters :(")
+        st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within budget/distance parameters")
     else:
         # Large Mobile-Friendly Randomizer Action Button
         if st.button("🎲 roll random selection", use_container_width=True):

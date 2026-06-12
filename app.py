@@ -1,21 +1,19 @@
 import streamlit as st
 import requests
 import random
+import math
 
 # =====================================================================
 # 1. MOBILE-FIRST UI LAYOUT & CUSTOM CSS STYLING
 # =====================================================================
 st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered")
 
-# Inject clean sans-serif typography, vibrant colors, mobile cards, and custom slider CSS
 st.markdown("""
     <style>
-        /* Force font styles across the application */
         html, body, [data-testid="stWidgetLabel"] p {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
         
-        /* Vibrant gradient header */
         .app-title {
             font-size: 32px !important;
             font-weight: 800 !important;
@@ -33,63 +31,6 @@ st.markdown("""
             margin-bottom: 20px;
         }
         
-        /* 🎨 STREAMLIT SLIDER CSS FIX: Transforms the ugly white bubble handle into a clean circle */
-        div[data-testid="stSlider"] [data-handle="true"] {
-            background-color: #FF4B4B !important;
-            border: 2px solid #ffffff !important;
-            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2) !important;
-            border-radius: 50% !important;
-            width: 20px !important;
-            height: 20px !important;
-            top: -2px !important;
-        }
-        
-        div[data-testid="stSlider"] [data-testid="stSliderTooltip"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-        }
-        
-        /* Mobile Stacked Card Containers */
-        .food-card {
-            background-color: #ffffff;
-            border: 1px solid #eef2f6;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 6px;
-        }
-        
-        .restaurant-name {
-            font-size: 18px !important;
-            font-weight: 700 !important;
-            color: #1e293b;
-            margin: 0;
-            text-transform: capitalize;
-        }
-        
-        .rating-badge {
-            background-color: #fef3c7;
-            color: #d97706;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-        
-        .card-meta {
-            font-size: 13px;
-            color: #64748b;
-            margin-bottom: 8px;
-        }
-        
         .tag-pill {
             display: inline-block;
             background-color: #f1f5f9;
@@ -103,11 +44,10 @@ st.markdown("""
             text-transform: lowercase;
         }
         
-        /* Interactive Highlight Banner for Random Selection */
         .winner-box {
             background: linear-gradient(135deg, #fff5f5 0%, #fff0ea 100%);
             border: 2px solid #ff4b4b;
-            border-radius: 16px;
+            border-radius: 166px;
             padding: 20px;
             margin-bottom: 24px;
             text-align: center;
@@ -128,10 +68,9 @@ else:
     st.stop()
 
 # =====================================================================
-# 3. HELPER FUNCTION: GEOLOCATION ROUTER
+# 3. UTILITY MODULES: FREE GEOMATH PROFILERS
 # =====================================================================
 def get_custom_coordinates(location_query):
-    """resolves custom text entries into clear coordinate pairs via google api v1"""
     geo_url = "https://places.googleapis.com/v1/places:searchText"
     geo_headers = {
         "Content-Type": "application/json",
@@ -149,8 +88,21 @@ def get_custom_coordinates(location_query):
                 return loc.get("latitude"), loc.get("longitude")
     except Exception:
         pass
-    # fallback default coordinates if network or query fails
     return 1.2913, 103.8499
+
+def calculate_haversine_distance(lat1, lon1, lat2, lon2):
+    """computes the absolute straight-line walking distance in meters completely for free"""
+    if not lat1 or not lon1 or not lat2 or not lon2:
+        return 0
+    radius = 6371000 # earth radius in metres
+    
+    d_lat = math.radians(lat2 - lat1)
+    d_lon = math.radians(lon2 - lon1)
+    
+    a = (math.sin(d_lat / 2) ** 2 + 
+         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(d_lon / 2) ** 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return int(radius * c)
 
 # The Comprehensive Google API V1 to SG-Crew Tag Translation Matrix
 GOOGLE_TYPE_TRANSLATOR = {
@@ -185,16 +137,12 @@ if "executed_vibe" not in st.session_state:
 # 4. MOBILE INTERACTIVE CONTROLS
 # =====================================================================
 st.write("### 📍 step 1: where you at?")
-# New text field input allowing on-the-fly custom geolocation mapping entries
-starting_point = st.text_input("enter current base (e.g. funan, bugis mrt, clarke quay)", value="funan mall").strip()
+starting_point = st.text_input("enter current base (e.g. funan, bugis mrt, rc4)", value="funan mall").strip()
 
 st.write("### 🎯 step 2: any cravings?")
-
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
 dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
-
-max_distance = st.sidebar.slider("scan radius (metres)", min_value=50, max_value=1600, value=300, step=50)
 
 price_tier = st.select_slider(
     "max budget range",
@@ -206,19 +154,19 @@ price_map = {"$": 1, "$$": 2, "$$$": 3, "$$$$": 4}
 max_allowed_price = price_map[price_tier[1]]
 
 # =====================================================================
-# 5. LOGICAL AREA TEXT SEARCH WITH DYNAMIC GEOLOCATION PIPELINE
+# 5. LOGICAL AREA TEXT SEARCH WITH DISTANCE CALCULATION
 # =====================================================================
 if st.button("📡 search!", use_container_width=True):
     with st.spinner("Analyzing building registry..."):
         
-        # Call our helper module to dynamically lookup the target coordinates
         target_lat, target_lng = get_custom_coordinates(starting_point if starting_point else "funan mall")
         
         url = "https://places.googleapis.com/v1/places:searchText"
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": API_KEY,
-            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types"
+            # Added places.location here so Google gives us the coordinates for math calculation
+            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types,places.location"
         }
         
         if selected_vibe == "🎲 surprise me! (random category)":
@@ -227,15 +175,10 @@ if st.button("📡 search!", use_container_width=True):
             target_vibe = selected_vibe
             
         st.session_state.executed_vibe = target_vibe
-        
-        search_radius = float(max_distance) if 'max_distance' in locals() else 300.0
         clean_vibe_name = target_vibe.split('  ')[0]
         
-        # Adaptive tracking text query formatting based on what the user types
-        if search_radius > 400.0:
-            search_string = f"{clean_vibe_name} food near {starting_point.lower()} singapore"
-        else:
-            search_string = f"{clean_vibe_name} joints in {starting_point.lower()} singapore"
+        # Look for general options within the target area context
+        search_string = f"{clean_vibe_name} food near {starting_point.lower()} singapore"
             
         payload = {
             "textQuery": search_string,
@@ -245,7 +188,7 @@ if st.button("📡 search!", use_container_width=True):
                         "latitude": target_lat, 
                         "longitude": target_lng
                     },
-                    "radius": search_radius
+                    "radius": 1500.0  # open default radius up to capturing roughly 2 MRT stops out
                 }
             }
         }
@@ -260,6 +203,14 @@ if st.button("📡 search!", use_container_width=True):
                 name = p.get("displayName", {}).get("text", "Unknown")
                 address = p.get("formattedAddress", "Singapore")
                 rating = p.get("rating", "N/A")
+                
+                # Fetch restaurant coordinates from payload block
+                spot_loc = p.get("location", {})
+                spot_lat = spot_loc.get("latitude")
+                spot_lng = spot_loc.get("longitude")
+                
+                # Run the math equation completely locally for free
+                meters_away = calculate_haversine_distance(target_lat, target_lng, spot_lat, spot_lng)
                 
                 raw_price_level = p.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
                 price_numeric = 0
@@ -293,7 +244,8 @@ if st.button("📡 search!", use_container_width=True):
                     "price_tier": price_display,
                     "address": address,
                     "status": status,
-                    "tags": list(tags)
+                    "tags": list(tags),
+                    "distance": meters_away # safe to state database entry
                 })
             
             filtered_list = []
@@ -303,6 +255,9 @@ if st.button("📡 search!", use_container_width=True):
                 if target_vibe not in item["tags"]:
                     continue
                 filtered_list.append(item)
+                
+            # 🔥 MAGIC HAPPENS HERE: Sort the list so the absolute closest spot is index 0
+            filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
                 
             st.session_state.radar_matches = filtered_list
         else:
@@ -326,7 +281,7 @@ if st.session_state.radar_matches is not None:
                     <p style="color: #FF4B4B; font-weight: 800; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">🎰 chosen option!</p>
                     <p class="restaurant-name" style="font-size: 24px !important;">{winner['name']}</p>
                     <p style="margin: 8px 0;">{tag_pills}</p>
-                    <p style="font-size: 14px; color: #333333; margin: 0;"><b>rating:</b> {winner['rating']} ⭐ | <b>price:</b> {winner['price_tier']}</p>
+                    <p style="font-size: 14px; color: #333333; margin: 0;"><b>dist:</b> {winner['distance']}m away | <b>rating:</b> {winner['rating']} ⭐</p>
                     <p style="font-size: 12px; color: #666666; margin-top: 6px;">{winner['status']}</p>
                 </div>
             """, unsafe_allow_html=True)
@@ -335,7 +290,9 @@ if st.session_state.radar_matches is not None:
         
         for spot in st.session_state.radar_matches:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
-            expander_title = f"🥞 {spot['name'].title()}  |  {spot['rating']} ⭐"
+            
+            # Formatted headers to explicitly print out distance right away (e.g., 🥞 Funan Sushi | 120m | 4.5 ⭐)
+            expander_title = f"🥞 {spot['name'].title()}  |  🚶 {spot['distance']}m  |  {spot['rating']} ⭐"
             
             with st.expander(expander_title):
                 st.markdown(f"""

@@ -4,29 +4,29 @@ import random
 import math
 
 # =====================================================================
-# 1. MOBILE-FIRST UI LAYOUT & CRISP PASTEL CSS STYLING
+# 1. MOBILE-FIRST UI LAYOUT & SOLID PASTEL PINK THEME CSS
 # =====================================================================
 st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered")
 
 st.markdown("""
     <style>
-        /* Global soothing text and clean typography */
-        html, body, [data-testid=\"stWidgetLabel\"] p {
+        /* Global typography and soft dark pink/grey text */
+        html, body, [data-testid="stWidgetLabel"] p {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            color: #4a4e69 !important;
+            color: #5c4d50 !important;
         }
         
-        /* Clean solid pastel purple title */
+        /* Solid Pastel Pink Header */
         .app-title {
             font-size: 34px !important;
             font-weight: 700 !important;
-            color: #b79ced !important;
+            color: #ffccd5 !important;
             margin-bottom: 0px;
             text-align: center;
         }
         
         .app-subtitle {
-            color: #9a8c98;
+            color: #ca948a;
             font-size: 14px;
             font-weight: 400;
             text-align: center;
@@ -34,28 +34,35 @@ st.markdown("""
             letter-spacing: 0.5px;
         }
         
-        /* 🎨 CLEAN PASTEL SLIDER */
-        div[data-testid=\"stSlider\"] [data-handle="true"] {
-            background-color: #c8b6ff !important;
+        /* 🎨 FULL PASTEL PINK SLIDER CUSTOMIZATION */
+        /* Changes the interactive moving circle handle to solid pastel pink */
+        div[data-testid="stSlider"] [data-handle="true"] {
+            background-color: #ffccd5 !important;
             border: 2px solid #ffffff !important;
-            box-shadow: 0px 2px 5px rgba(200, 182, 255, 0.4) !important;
+            box-shadow: 0px 2px 6px rgba(255, 204, 213, 0.6) !important;
             border-radius: 50% !important;
             width: 18px !important;
             height: 18px !important;
             top: -1px !important;
         }
         
-        div[data-testid=\"stSlider\"] [data-testid=\"stSliderTooltip\"] {
+        /* Changes the filled active bar track color to matching pink */
+        div[data-testid="stSlider"] [data-testid="stSliderTrack"] > div > div {
+            background-color: #ffccd5 !important;
+        }
+        
+        /* Hides the default numeric tooltip text blocks over the slider handle */
+        div[data-testid="stSlider"] [data-testid="stSliderTooltip"] {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
         }
         
-        /* Matte grey/purple lowercase tags */
+        /* Soft Pink Tag Pills */
         .tag-pill {
             display: inline-block;
-            background-color: #e8e8e4;
-            color: #6d597a;
+            background-color: #fff0f1;
+            color: #c97a8e;
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 11px;
@@ -63,12 +70,12 @@ st.markdown("""
             margin-right: 5px;
             margin-bottom: 5px;
             text-transform: lowercase;
-            border: 1px solid #d8e2dc;
+            border: 1px solid #ffccd5;
         }
         
-        /* Solid soft blush pink box for choice winner */
+        /* Soft Pink Highlight Box for Randomizer Choice Box */
         .winner-box {
-            background-color: #fff0f1;
+            background-color: #fff5f6;
             border: 1px solid #ffccd5;
             border-radius: 12px;
             padding: 22px;
@@ -76,23 +83,23 @@ st.markdown("""
             text-align: center;
         }
         
-        /* Low contrast matte cards for search items */
-        div[data-testid=\"stExpander\"] {
+        /* Low contrast pink border cards for expansion items */
+        div[data-testid="stExpander"] {
             background-color: #ffffff !important;
-            border: 1px solid #f0efeb !important;
+            border: 1px solid #fff0f1 !important;
             border-radius: 12px !important;
-            box-shadow: 0 2px 8px rgba(216, 226, 220, 0.2) !important;
+            box-shadow: 0 2px 8px rgba(255, 240, 241, 0.5) !important;
             margin-bottom: 8px !important;
         }
         
-        /* 🛠️ INDIVIDUAL SOLID COLORS FOR BUTTONS */
+        /* 🛠️ INDIVIDUAL SOLID PINK BUTTON STYLES */
         
-        /* Button 1: Main Search (Solid Soft Lavender) */
+        /* Main Search Button (Solid Pastel Lavender/Pink Hint) */
         div.stButton > button:first-child, 
-        div[data-testid=\"stFormSubmitButton\"] > button {
-            background-color: #e8dff5 !important;
-            color: #6d597a !important;
-            border: 1px solid #dcd1eb !important;
+        div[data-testid="stFormSubmitButton"] > button {
+            background-color: #fff0f1 !important;
+            color: #c97a8e !important;
+            border: 1px solid #ffccd5 !important;
             padding: 10px 20px !important;
             border-radius: 10px !important;
             font-weight: 600 !important;
@@ -100,10 +107,10 @@ st.markdown("""
             width: 100%;
         }
         
-        /* Button 2: Random Selection (Solid Soft Pink) */
+        /* Random Selection Button (Solid Soft Blush Pink) */
         div.stBlock:has(div.winner-box) + div.stButton > button,
         .stButton:nth-of-type(2) > button, 
-        div[data-testid=\"element-container\"] + div.stButton > button {
+        div[data-testid="element-container"] + div.stButton > button {
             background-color: #fce1e4 !important;
             color: #c97a8e !important;
             border: 1px solid #f9ccd2 !important;
@@ -332,15 +339,15 @@ if st.session_state.radar_matches is not None:
             
             st.markdown(f"""
                 <div class="winner-box">
-                    <p style="color: #ca948a; font-weight: 700; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">✨ chosen option!</p>
-                    <p class="restaurant-name" style="font-size: 24px !important; color: #4a4e69; font-weight:700;">{winner['name'].lower()}</p>
+                    <p style="color: #c97a8e; font-weight: 700; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">✨ chosen option!</p>
+                    <p class="restaurant-name" style="font-size: 24px !important; color: #5c4d50; font-weight:700;">{winner['name'].lower()}</p>
                     <p style="margin: 8px 0;">{tag_pills}</p>
-                    <p style="font-size: 14px; color: #6d597a; margin: 0;"><b>dist:</b> {winner['distance']}m away | <b>rating:</b> {winner['rating']} ⭐</p>
-                    <p style="font-size: 12px; color: #9a8c98; margin-top: 6px;">{winner['status']}</p>
+                    <p style="font-size: 14px; color: #ca948a; margin: 0;"><b>dist:</b> {winner['distance']}m away | <b>rating:</b> {winner['rating']} ⭐</p>
+                    <p style="font-size: 12px; color: #ca948a; margin-top: 6px;">{winner['status']}</p>
                 </div>
             """, unsafe_allow_html=True)
             
-        st.markdown(f'<h3 style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #6d597a;">📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})</h3>', unsafe_allow_html=True)
+        st.markdown(f'<h3 style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #c97a8e;">📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})</h3>', unsafe_allow_html=True)
         
         for spot in st.session_state.radar_matches:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
@@ -350,14 +357,14 @@ if st.session_state.radar_matches is not None:
             with st.expander(expander_title):
                 st.markdown(f"""
                     <div style="padding: 5px 0px;">
-                        <p style="font-size: 13px; color: #9a8c98; margin-bottom: 8px;">
+                        <p style="font-size: 13px; color: #ca948a; margin-bottom: 8px;">
                             <b>budget:</b> {spot['price_tier']} | <b>status:</b> {spot['status']}
                         </p>
                         <div style="margin-bottom: 12px;">
                             {pills_html}
                         </div>
-                        <div style="background-color: #f8f9fa; border-left: 3px solid #d8e2dc; padding: 10px; border-radius: 6px;">
-                            <p style="font-size: 12px; color: #6d597a; margin: 0; font-family: monospace;">
+                        <div style="background-color: #fffafb; border-left: 3px solid #ffccd5; padding: 10px; border-radius: 6px;">
+                            <p style="font-size: 12px; color: #c97a8e; margin: 0; font-family: monospace;">
                                 📍 {spot['address'].lower()}
                             </p>
                         </div>

@@ -243,17 +243,19 @@ if st.button("📡 Scan Building Blueprint", use_container_width=True):
         if selected_vibe != "Show All Options":
             search_string = f"{selected_vibe.lower()} joints in funan singapore"
             
-        # Fixed payload schema structure for the Places API (New) TextSearch engine
+        # The officially supported payload layout for Google v1/places:searchText
         payload = {
             "textQuery": search_string,
-            # Bounding the text query strictly within Funan's coordinate area
+            # Biases results heavily toward Funan's coordinates using an official V1 circle object
             "locationBias": {
                 "circle": {
-                    "center": {"latitude": FUNAN_LAT, "longitude": FUNAN_LNG},
-                    "radius": 150.0
+                    "center": {
+                        "latitude": FUNAN_LAT, 
+                        "longitude": FUNAN_LNG
+                    },
+                    "radius": float(max_distance)
                 }
-            },
-            "strictRestriction": True # Forces Google to keep matches inside the 150m mall bounds
+            }
         }
         
         response = requests.post(url, json=payload, headers=headers)

@@ -198,7 +198,7 @@ if st.button("📡 search!", use_container_width=True):
         
         # 🎲 THE DYNAMIC SURPRISE OVERRIDE ENGINE:
         # Resolves the 20-result cap by rolling a randomized target array selection *before* the API execution call
-        if selected_vibe == "🎲 Surprise Me! (Random Category)":
+        if selected_vibe == "🎲 surprise me! (random category)":
             target_vibe = random.choice(unique_display_tags)
         else:
             target_vibe = selected_vibe

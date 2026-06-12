@@ -137,7 +137,7 @@ if "executed_vibe" not in st.session_state:
 # 4. MOBILE INTERACTIVE CONTROLS
 # =====================================================================
 st.write("### 📍 step 1: where you at?")
-starting_point = st.text_input("enter current base (e.g. funan, bugis mrt, rc4)", value="funan mall").strip()
+starting_point = st.text_input("enter current location (e.g. funan, bugis, chinatown)", value="funan mall").strip()
 
 st.write("### 🎯 step 2: any cravings?")
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))

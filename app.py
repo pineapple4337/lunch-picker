@@ -301,10 +301,10 @@ if st.session_state.radar_matches is not None:
             
             st.markdown(f"""
                 <div class="winner-box">
-                    <p style="color: #FF4B4B; font-weight: 800; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: uppercase;">🎰 Chosen Option</p>
+                    <p style="color: #FF4B4B; font-weight: 800; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: uppercase;">🎰 chosen option!</p>
                     <p class="restaurant-name" style="font-size: 24px !important;">{winner['name']}</p>
                     <p style="margin: 8px 0;">{tag_pills}</p>
-                    <p style="font-size: 14px; color: #333333; margin: 0;"><b>Rating:</b> {winner['rating']} ⭐ | <b>Price:</b> {winner['price_tier']}</p>
+                    <p style="font-size: 14px; color: #333333; margin: 0;"><b>rating:</b> {winner['rating']} ⭐ | <b>price:</b> {winner['price_tier']}</p>
                     <p style="font-size: 12px; color: #666666; margin-top: 6px;">{winner['status']}</p>
                 </div>
             """, unsafe_allow_html=True)

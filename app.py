@@ -4,22 +4,23 @@ import random
 import math
 
 # =====================================================================
-# 1. MOBILE-FIRST UI LAYOUT & PASTEL PINK-PURPLE CSS STYLING
+# 1. MOBILE-FIRST UI LAYOUT & MUTED PASTEL CSS STYLING
 # =====================================================================
 st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered")
 
 st.markdown("""
     <style>
-        /* Force clean sans-serif typography across the app */
+        /* Global soothing light background and soft typography */
         html, body, [data-testid="stWidgetLabel"] p {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            color: #4a4e69 !important;
         }
         
-        /* Pastel Pink to Purple gradient title */
+        /* Muted Lavender to Blush Pink soft pastel gradient */
         .app-title {
             font-size: 34px !important;
-            font-weight: 800 !important;
-            background: linear-gradient(135deg, #ec4899, #a855f7);
+            font-weight: 700 !important;
+            background: linear-gradient(135deg, #b79ced, #fbc4ab);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0px;
@@ -27,23 +28,23 @@ st.markdown("""
         }
         
         .app-subtitle {
-            color: #8b5cf6;
+            color: #9a8c98;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 400;
             text-align: center;
             margin-bottom: 25px;
             letter-spacing: 0.5px;
         }
         
-        /* 🎨 CUSTOM PASTEL SLIDER & SELECTION CONTROLS */
+        /* 🎨 DULLED PASTEL SLIDER CONTROLS */
         div[data-testid="stSlider"] [data-handle="true"] {
-            background-color: #a855f7 !important;
+            background-color: #c8b6ff !important;
             border: 2px solid #ffffff !important;
-            box-shadow: 0px 2px 6px rgba(168, 85, 247, 0.4) !important;
+            box-shadow: 0px 2px 5px rgba(200, 182, 255, 0.5) !important;
             border-radius: 50% !important;
-            width: 20px !important;
-            height: 20px !important;
-            top: -2px !important;
+            width: 18px !important;
+            height: 18px !important;
+            top: -1px !important;
         }
         
         div[data-testid="stSlider"] [data-testid="stSliderTooltip"] {
@@ -52,55 +53,56 @@ st.markdown("""
             opacity: 0 !important;
         }
         
-        /* Pastel Pink/Purple Tag Pills */
+        /* Ultra-soft Cream/Lavender Tag Pills */
         .tag-pill {
             display: inline-block;
-            background-color: #f3e8ff;
-            color: #6b21a8;
+            background-color: #f0efa640; /* soft touch tint */
+            background: #e8e8e4;
+            color: #6d597a;
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 500;
             margin-right: 5px;
             margin-bottom: 5px;
             text-transform: lowercase;
-            border: 1px solid #e9d5ff;
+            border: 1px solid #d8e2dc;
         }
         
-        /* Soft Pastel Pink/Purple Highlight Box for Randomizer Winner */
+        /* Soft Milk-Tea/Blush Highlight Box for Randomizer Winner */
         .winner-box {
-            background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%);
-            border: 2px dashed #ec4899;
+            background: linear-gradient(135deg, #fceade 0%, #f3eae8 100%);
+            border: 2px dashed #e8aeac;
             border-radius: 16px;
             padding: 22px;
             margin-bottom: 24px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.05);
         }
         
-        /* Style adjustments for Streamlit's container widgets */
+        /* Low contrast matte cards for individual search elements */
         div[data-testid="stExpander"] {
             background-color: #ffffff !important;
-            border: 1px solid #fae8ff !important;
-            border-radius: 10px !important;
-            box-shadow: 0 2px 4px rgba(243, 232, 255, 0.3) !important;
+            border: 1px solid #f0efeb !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 8px rgba(216, 226, 220, 0.3) !important;
             margin-bottom: 8px !important;
         }
         
-        /* Styled buttons matching the palette */
+        /* Softer, non-glary action buttons */
         .stButton>button {
-            background: linear-gradient(135deg, #f472b6, #c084fc) !important;
-            color: white !important;
+            background: linear-gradient(135deg, #e8aeac, #b8c0ff) !important;
+            color: #4a4e69 !important;
             border: none !important;
             padding: 10px 20px !important;
             border-radius: 10px !important;
-            font-weight: 700 !important;
+            font-weight: 600 !important;
             transition: all 0.2s ease !important;
+            box-shadow: 0 2px 4px rgba(184, 192, 255, 0.2) !important;
         }
         
         .stButton>button:hover {
             transform: translateY(-1px) !important;
-            box-shadow: 0 4px 12px rgba(192, 132, 252, 0.4) !important;
+            box-shadow: 0 4px 10px rgba(184, 192, 255, 0.4) !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -226,7 +228,7 @@ if st.button("📡 search!", use_container_width=True):
         st.session_state.executed_vibe = target_vibe
         clean_vibe_name = target_vibe.split('  ')[0]
         
-        # 🛡️ Fallback fix to protect coordinate boundary integrity
+        # Fallback tracking control line
         base_location = starting_point if starting_point else "funan mall"
         search_string = f"{clean_vibe_name} food near {base_location.lower()} singapore"
         
@@ -238,7 +240,7 @@ if st.button("📡 search!", use_container_width=True):
                         "latitude": target_lat, 
                         "longitude": target_lng
                     },
-                    "radius": 1500.0  # open default radius up to capturing roughly 2 MRT stops out
+                    "radius": 1500.0
                 }
             }
         }
@@ -254,12 +256,10 @@ if st.button("📡 search!", use_container_width=True):
                 address = p.get("formattedAddress", "Singapore")
                 rating = p.get("rating", "N/A")
                 
-                # Fetch restaurant coordinates from payload block
                 spot_loc = p.get("location", {})
                 spot_lat = spot_loc.get("latitude")
                 spot_lng = spot_loc.get("longitude")
                 
-                # Run the math equation completely locally for free
                 meters_away = calculate_haversine_distance(target_lat, target_lng, spot_lat, spot_lng)
                 
                 raw_price_level = p.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
@@ -306,9 +306,7 @@ if st.button("📡 search!", use_container_width=True):
                     continue
                 filtered_list.append(item)
                 
-            # Sort the list so the absolute closest spot is index 0
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
-                
             st.session_state.radar_matches = filtered_list
         else:
             st.error(f"API Engine Error: {response.text}")
@@ -328,33 +326,32 @@ if st.session_state.radar_matches is not None:
             
             st.markdown(f"""
                 <div class="winner-box">
-                    <p style="color: #ec4899; font-weight: 800; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">🔮 chosen option!</p>
-                    <p class="restaurant-name" style="font-size: 24px !important; color: #4c1d95;">{winner['name']}</p>
+                    <p style="color: #ca948a; font-weight: 700; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">✨ chosen option!</p>
+                    <p class="restaurant-name" style="font-size: 24px !important; color: #4a4e69; font-weight:700;">{winner['name'].lower()}</p>
                     <p style="margin: 8px 0;">{tag_pills}</p>
-                    <p style="font-size: 14px; color: #5b21b6; margin: 0;"><b>dist:</b> {winner['distance']}m away | <b>rating:</b> {winner['rating']} ⭐</p>
-                    <p style="font-size: 12px; color: #701a75; margin-top: 6px;">{winner['status']}</p>
+                    <p style="font-size: 14px; color: #6d597a; margin: 0;"><b>dist:</b> {winner['distance']}m away | <b>rating:</b> {winner['rating']} ⭐</p>
+                    <p style="font-size: 12px; color: #9a8c98; margin-top: 6px;">{winner['status']}</p>
                 </div>
             """, unsafe_allow_html=True)
             
-        st.markdown(f'<h3 style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #6b21a8;">📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})</h3>', unsafe_allow_html=True)
+        st.markdown(f'<h3 style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #6d597a;">📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})</h3>', unsafe_allow_html=True)
         
         for spot in st.session_state.radar_matches:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
             
-            # Formatted headers to explicitly print out distance right away
-            expander_title = f"✨ {spot['name'].title()}  |  🚶 {spot['distance']}m  |  {spot['rating']} ⭐"
+            expander_title = f"✨ {spot['name'].lower()}  |  🚶 {spot['distance']}m  |  {spot['rating']} ⭐"
             
             with st.expander(expander_title):
                 st.markdown(f"""
                     <div style="padding: 5px 0px;">
-                        <p style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
+                        <p style="font-size: 13px; color: #9a8c98; margin-bottom: 8px;">
                             <b>budget:</b> {spot['price_tier']} | <b>status:</b> {spot['status']}
                         </p>
                         <div style="margin-bottom: 12px;">
                             {pills_html}
                         </div>
-                        <div style="background-color: #faf5ff; border-left: 3px solid #d8b4fe; padding: 10px; border-radius: 6px;">
-                            <p style="font-size: 12px; color: #5b21b6; margin: 0; font-family: monospace;">
+                        <div style="background-color: #f8f9fa; border-left: 3px solid #d8e2dc; padding: 10px; border-radius: 6px;">
+                            <p style="font-size: 12px; color: #6d597a; margin: 0; font-family: monospace;">
                                 📍 {spot['address'].lower()}
                             </p>
                         </div>

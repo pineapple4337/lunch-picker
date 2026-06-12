@@ -44,14 +44,10 @@ st.markdown("""
             top: -2px !important;
         }
         
-        /* Fix the slider tooltips to look clean and minimalist */
         div[data-testid="stSlider"] [data-testid="stSliderTooltip"] {
-            background-color: #FF4B4B !important;
-            color: white !important;
-            border-radius: 6px !important;
-            font-size: 11px !important;
-            font-weight: bold !important;
-            padding: 2px 6px !important;
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
         }
         
         /* Mobile Stacked Card Containers */

@@ -10,11 +10,6 @@ st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered
 
 st.markdown("""
     <style>
-        /* FULL BACKGROUND OVERRIDE TO SOFT LAVENDER BLUSH #fff0f5 */
-        .stApp, div[data-testid="stAppViewContainer"], div[data-testid="stHeader"] {
-            background-color: #fff0f5 !important;
-        }
-
         /* Global typography and muted warm dark text */
         html, body, [data-testid="stWidgetLabel"] p {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;

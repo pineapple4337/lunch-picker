@@ -4,19 +4,24 @@ import random
 import math
 
 # =====================================================================
-# 1. MOBILE-FIRST UI LAYOUT & SOLID PASTEL PINK THEME CSS
+# 1. MOBILE-FIRST UI LAYOUT & DUSTY ROSE PASTEL THEME WITH PINK BG
 # =====================================================================
 st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered")
 
 st.markdown("""
     <style>
-        /* Global typography and soft dark pink/grey text */
+        /* FULL BACKGROUND OVERRIDE TO SOFT LAVENDER BLUSH #fff0f5 */
+        .stApp, div[data-testid="stAppViewContainer"], div[data-testid="stHeader"] {
+            background-color: #fff0f5 !important;
+        }
+
+        /* Global typography and muted warm dark text */
         html, body, [data-testid="stWidgetLabel"] p {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             color: #5c4d50 !important;
         }
         
-        /* Solid Pastel Pink Header */
+        /* Muted Dusty Rose Header Elements */
         .app-title {
             font-size: 34px !important;
             font-weight: 700 !important;
@@ -26,7 +31,7 @@ st.markdown("""
         }
         
         .app-subtitle {
-            color: #c97a8e;
+            color: #ca948a;
             font-size: 14px;
             font-weight: 400;
             text-align: center;
@@ -34,8 +39,7 @@ st.markdown("""
             letter-spacing: 0.5px;
         }
         
-        /* 🎨 FULL PASTEL PINK SLIDER CUSTOMIZATION */
-        /* Changes the interactive moving circle handle to solid pastel pink */
+        /* 🎨 FULL PASTEL PINK SLIDER CUSTOMIZATION (TOOLTIPS RE-ENABLED & STYLED) */
         div[data-testid="stSlider"] [data-handle="true"] {
             background-color: #ffccd5 !important;
             border: 2px solid #ffffff !important;
@@ -46,22 +50,24 @@ st.markdown("""
             top: -1px !important;
         }
         
-        /* Changes the filled active bar track color to matching pink */
         div[data-testid="stSlider"] [data-testid="stSliderTrack"] > div > div {
-            background-color: #ffffff !important;
+            background-color: #c97a8e !important;
         }
-        
-        /* Hides the default numeric tooltip text blocks over the slider handle */
-        div[data-testid="stSlider"] [data-testid="stSliderTooltip"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
+
+        /* Styles the floating numbers above the slider handle beautifully */
+        div[data-testid="stSlider"] [data-testid="stSliderTooltip"] > div {
+            background-color: #fce1e4 !important;
+            color: #c97a8e !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            border-radius: 6px !important;
+            border: 1px solid #f9ccd2 !important;
         }
         
         /* Soft Pink Tag Pills */
         .tag-pill {
             display: inline-block;
-            background-color: #fff0f1;
+            background-color: #fff5f6;
             color: #c97a8e;
             padding: 3px 10px;
             border-radius: 20px;
@@ -73,28 +79,27 @@ st.markdown("""
             border: 1px solid #ffccd5;
         }
         
-        /* Soft Pink Highlight Box for Randomizer Choice Box */
+        /* Solid White Choice Container for Crisp Text Readability against Pink BG */
         .winner-box {
-            background-color: #fff5f6;
+            background-color: #ffffff;
             border: 1px solid #ffccd5;
             border-radius: 12px;
             padding: 22px;
             margin-bottom: 24px;
             text-align: center;
+            box-shadow: 0 4px 12px rgba(255, 204, 213, 0.2);
         }
         
-        /* Low contrast pink border cards for expansion items */
+        /* Expansion result cards styling */
         div[data-testid="stExpander"] {
             background-color: #ffffff !important;
             border: 1px solid #fff0f1 !important;
             border-radius: 12px !important;
-            box-shadow: 0 2px 8px rgba(255, 240, 241, 0.5) !important;
+            box-shadow: 0 2px 8px rgba(255, 204, 213, 0.15) !important;
             margin-bottom: 8px !important;
         }
         
-        /* 🛠️ INDIVIDUAL SOLID PINK BUTTON STYLES */
-        
-        /* Main Search Button (Solid Pastel Lavender/Pink Hint) */
+        /* 🛠️ COHESIVE SOLID PINK BUTTON STYLES */
         div.stButton > button:first-child, 
         div[data-testid="stFormSubmitButton"] > button {
             background-color: #fff0f1 !important;
@@ -107,7 +112,6 @@ st.markdown("""
             width: 100%;
         }
         
-        /* Random Selection Button (Solid Soft Blush Pink) */
         div.stBlock:has(div.winner-box) + div.stButton > button,
         .stButton:nth-of-type(2) > button, 
         div[data-testid="element-container"] + div.stButton > button {
@@ -136,7 +140,7 @@ else:
     st.stop()
 
 # =====================================================================
-# 3. UTILITY MODULES: GEOMATH ENGINE
+# 3. UTILITY MODULES: GEOMATH ENGINE & ESTIMATION TRICKS
 # =====================================================================
 def get_custom_coordinates(location_query):
     geo_url = "https://places.googleapis.com/v1/places:searchText"
@@ -170,6 +174,13 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
          math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(d_lon / 2) ** 2)
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return int(radius * c)
+
+def get_walking_time_string(distance_meters):
+    """Calculates human walking time (approx 80 meters per min) entirely for free inside Python"""
+    minutes = math.ceil(distance_meters / 80)
+    if minutes <= 1:
+        return "~1 min walk"
+    return f"~{minutes} mins walk"
 
 GOOGLE_TYPE_TRANSLATOR = {
     "japanese_restaurant": "japanese  🍣 🍜 🍱", "sushi_restaurant": "japanese  🍣 🍜 🍱", "ramen_restaurant": "japanese  🍣 🍜 🍱",
@@ -216,11 +227,8 @@ price_tier = st.select_slider(
     value=("$", "$$")
 )
 
-price_map = {"$": 1, "$$": 2, "$$$": 3, "$$$$": 4}
-max_allowed_price = price_map[price_tier[1]]
-
 # =====================================================================
-# 5. LOGICAL AREA TEXT SEARCH WITH DISTANCE CALCULATION
+# 5. API SEARCH WITH LOGICAL RESPONSE PROCESSING
 # =====================================================================
 if st.button("📡 search!", use_container_width=True):
     with st.spinner("loading..."):
@@ -276,17 +284,16 @@ if st.button("📡 search!", use_container_width=True):
                 meters_away = calculate_haversine_distance(target_lat, target_lng, spot_lat, spot_lng)
                 
                 raw_price_level = p.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
-                price_numeric = 0
-                price_display = "??? 💵"
+                price_display = "not listed"
                 
                 if "INEXPENSIVE" in raw_price_level:
-                    price_numeric, price_display = 1, "$"
+                    price_display = "$"
                 elif "MODERATE" in raw_price_level:
-                    price_numeric, price_display = 2, "$$"
+                    price_display = "$$"
                 elif "EXPENSIVE" in raw_price_level:
-                    price_numeric, price_display = 3, "$$$"
+                    price_display = "$$$"
                 elif "VERY_EXPENSIVE" in raw_price_level:
-                    price_numeric, price_display = 4, "$$$$"
+                    price_display = "$$$$"
                 
                 tags = set()
                 google_types = p.get("types", [])
@@ -303,7 +310,6 @@ if st.button("📡 search!", use_container_width=True):
                 processed_list.append({
                     "name": name,
                     "rating": rating,
-                    "price_score": price_numeric,
                     "price_tier": price_display,
                     "address": address,
                     "status": status,
@@ -313,14 +319,16 @@ if st.button("📡 search!", use_container_width=True):
             
             filtered_list = []
             for item in processed_list:
-                if item["price_score"] > max_allowed_price:
-                    continue
+                # UX Choice: Keep unrated places visible so popular options don't break/vanish
                 if target_vibe not in item["tags"]:
                     continue
                 filtered_list.append(item)
                 
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
             st.session_state.radar_matches = filtered_list
+            
+            # 💡 UX SOLUTION: Triggers an instant user toast guide to notify that results are loaded below
+            st.toast("✨ choices loaded below!", icon="📋")
         else:
             st.error(f"API Engine Error: {response.text}")
 
@@ -331,19 +339,24 @@ if st.session_state.radar_matches is not None:
     st.write("---")
     
     if len(st.session_state.radar_matches) == 0:
-        st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within budget/distance parameters")
+        st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within parameters")
     else:
         if st.button("🎲 roll random selection", use_container_width=True):
             winner = random.choice(st.session_state.radar_matches)
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
+            walk_time = get_walking_time_string(winner['distance'])
             
+            # 💡 UX SOLUTION: Expanded winner card instantly printing distance, walk estimation and clean location address
             st.markdown(f"""
                 <div class="winner-box">
                     <p style="color: #c97a8e; font-weight: 700; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">✨ chosen option!</p>
                     <p class="restaurant-name" style="font-size: 24px !important; color: #5c4d50; font-weight:700;">{winner['name'].lower()}</p>
                     <p style="margin: 8px 0;">{tag_pills}</p>
-                    <p style="font-size: 14px; color: #ca948a; margin: 0;"><b>dist:</b> {winner['distance']}m away | <b>rating:</b> {winner['rating']} ⭐</p>
-                    <p style="font-size: 12px; color: #ca948a; margin-top: 6px;">{winner['status']}</p>
+                    <p style="font-size: 14px; color: #ca948a; margin: 0;"><b>dist:</b> {winner['distance']}m ({walk_time}) | <b>rating:</b> {winner['rating']} ⭐</p>
+                    <p style="font-size: 12px; color: #ca948a; margin-top: 5px;"><b>status:</b> {winner['status']}</p>
+                    <div style="background-color: #fffafb; border: 1px dashed #ffccd5; padding: 8px; border-radius: 6px; margin-top: 10px;">
+                        <p style="font-size: 11px; color: #c97a8e; margin: 0; font-family: monospace;">📍 {winner['address'].lower()}</p>
+                    </div>
                 </div>
             """, unsafe_allow_html=True)
             
@@ -351,8 +364,10 @@ if st.session_state.radar_matches is not None:
         
         for spot in st.session_state.radar_matches:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
+            walk_time = get_walking_time_string(spot['distance'])
             
-            expander_title = f"✨ {spot['name'].lower()}  |  🚶 {spot['distance']}m  |  {spot['rating']} ⭐"
+            # Displays exact walking minutes directly alongside the card header title
+            expander_title = f"✨ {spot['name'].lower()}  |  🚶 {spot['distance']}m ({walk_time})  |  {spot['rating']} ⭐"
             
             with st.expander(expander_title):
                 st.markdown(f"""

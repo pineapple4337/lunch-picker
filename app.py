@@ -145,9 +145,8 @@ def get_custom_coordinates(location_query):
         "X-Goog-FieldMask": "places.location"
     }
     
-    # Smart check: only append "singapore" if they didn't explicitly specify an overseas spot
     query_lower = location_query.lower()
-    international_keywords = ["stockholm", "sweden", "kl", "johor", "malaysia", "tokyo", "japan", "london", "paris"]
+    international_keywords = ["stockholm", "kth", "sweden", "malaysia", "johor", "tokyo", "japan", "london", "paris"]
     
     if not any(word in query_lower for word in international_keywords):
         full_query = f"{location_query} singapore"
@@ -253,19 +252,17 @@ if st.button("🔍 search!", use_container_width=True):
             
         st.session_state.executed_vibe = target_vibe
         
-        # Reverse map to grab EVERY single official database type associated with this tag
         matched_google_types = [
             g_type for g_type, vibe_string in GOOGLE_TYPE_TRANSLATOR.items() 
             if vibe_string == target_vibe
         ]
         
-        # Generic anchor text query so keyword bias doesn't force a preference
         base_location = starting_point if starting_point else "funan mall"
         search_string = f"restaurant near {base_location.lower()}"
         
         payload = {
             "textQuery": search_string,
-            "includedTypes": matched_google_types,  # 🎯 Structural database filtering matches all types equally
+            "includedPrimaryTypes": matched_google_types,  # 🎯 Fixed field name valid for searchText endpoints
             "locationBias": {
                 "circle": {
                     "center": {

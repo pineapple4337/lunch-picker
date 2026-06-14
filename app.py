@@ -113,12 +113,6 @@ st.markdown("""
             opacity: 0.9 !important;
         }
         
-        /* Allow multi-line expander text strings to wrap beautifully */
-        div[data-testid="stExpander"] summary p {
-            white-space: pre-line !important;
-            line-height: 1.5 !important;
-        }
-        
         /* Forces expander titles to respect string line breaks beautifully on mobile viewports */
         div[data-testid="stExpander"] summary p {
             white-space: pre-line !important;
@@ -161,7 +155,7 @@ def get_custom_coordinates(location_query):
     elif any(local_word in query_lower for local_word in local_anchors):
         full_query = f"{location_query} singapore" if "singapore" not in query_lower else location_query
     else:
-        full_query = f"{location_query} condo singapore"
+        full_query = location_query
         
     geo_payload = {"textQuery": full_query}
     
@@ -235,8 +229,6 @@ st.write("### 🎯 step 2: any cravings?")
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
 dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
-
-# 💡 BUDGET SLIDER REMOVED FROM HERE FOR A CLEANER UI
 
 # =====================================================================
 # 5. API SEARCH WITH LOGICAL RESPONSE PROCESSING
@@ -366,11 +358,7 @@ if st.session_state.radar_matches is not None:
     if len(st.session_state.radar_matches) == 0:
         st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within parameters")
     else:
-        if st.button("🎲 roll random selection?", use_container_width=True):
-            # Turn off inline notification banner when the user starts interacting with random selections
-            st.session_state.show_inline_banner = False
-            
-            if st.button("🎲 roll random selection", use_container_width=True):
+        if st.button("🎲 roll random selection", use_container_width=True):
             winner = random.choice(st.session_state.radar_matches)
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
             walk_time = get_walking_time_string(winner['distance'])

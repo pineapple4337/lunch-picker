@@ -366,7 +366,7 @@ if st.session_state.radar_matches is not None:
     if len(st.session_state.radar_matches) == 0:
         st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within parameters")
     else:
-        if st.button("🎲 roll random selection", use_container_width=True):
+        if st.button("🎲 roll random selection?", use_container_width=True):
             # Turn off inline notification banner when the user starts interacting with random selections
             st.session_state.show_inline_banner = False
             

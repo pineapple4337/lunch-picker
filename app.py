@@ -337,8 +337,14 @@ if st.button("🔍 search!", use_container_width=True):
                 
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
             st.session_state.radar_matches = filtered_list
-            # Set state tracker to trigger the inline page notification banner
-            st.session_state.show_inline_banner = True
+
+            # 💡 Minimalist inline status text directly underneath the button
+            st.markdown(
+                f'<p style="color: #c97a8e; font-size: 13px; font-weight: 500; text-align: center; margin-top: 10px; margin-bottom: -10px;">'
+                f'✨ found {len(filtered_list)} options near your location below! 📋👇'
+                f'</p>', 
+                unsafe_allow_html=True
+            )
         else:
             st.error(f"API Engine Error: {response.text}")
 
@@ -346,12 +352,7 @@ if st.button("🔍 search!", use_container_width=True):
 # 6. MOBILE RENDERING LAYER (CARDS & RANDOMISER)
 # =====================================================================
 if st.session_state.radar_matches is not None:
-    st.write("---")
     
-    # 💡 INLINE NOTIFICATION: Renders natively inside the flow of the page body
-    if st.session_state.show_inline_banner and len(st.session_state.radar_matches) > 0:
-        st.markdown('<div class="status-banner">results found! scroll down for the list 👇</div>', unsafe_allow_html=True)
-        
     if len(st.session_state.radar_matches) == 0:
         st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within parameters")
     else:

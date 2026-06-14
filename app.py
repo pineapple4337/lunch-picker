@@ -345,11 +345,13 @@ if st.button("🔍 search!", use_container_width=True):
                 
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
             st.session_state.radar_matches = filtered_list
-
-            # 💡 Wrap message safely with positive padding so layout blocks stack normally
+            
+            # 💡 Symmetrical spacing fix: Adjusts padding to counter Streamlit's container defaults
             st.markdown(
-                f'<div style="width: 100%; text-align: center; padding: 12px 0 4px 0; clear: both;">'
-                f'<p style="color: #c97a8e; font-size: 13px; font-weight: 600; margin: 0; display: inline-block;">'
+                f'<div style="display: flex; justify-content: center; align-items: center; '
+                f'width: 100%; padding: 18px 0px 18px 0px; margin: 0 auto; clear: both;">'
+                f'<p style="color: #c97a8e; font-size: 13px; font-weight: 600; margin: 0; '
+                f'line-height: 1; text-align: center; letter-spacing: 0.2px;">'
                 f'✨ found {len(filtered_list)} options near your location below! 📋👇'
                 f'</p>'
                 f'</div>', 

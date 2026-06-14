@@ -346,12 +346,10 @@ if st.button("🔍 search!", use_container_width=True):
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
             st.session_state.radar_matches = filtered_list
             
-            # 💡 Symmetrical spacing fix: Adjusts padding to counter Streamlit's container defaults
+            # 🎯 Counter-balance Streamlit's structural block layout gaps
             st.markdown(
-                f'<div style="display: flex; justify-content: center; align-items: center; '
-                f'width: 100%; padding: 18px 0px 18px 0px; margin: 0 auto; clear: both;">'
-                f'<p style="color: #c97a8e; font-size: 13px; font-weight: 600; margin: 0; '
-                f'line-height: 1; text-align: center; letter-spacing: 0.2px;">'
+                f'<div style="text-align: center; width: 100%; margin-top: -8px; margin-bottom: 12px; clear: both;">'
+                f'<p style="color: #c97a8e; font-size: 14px; font-weight: 600; margin: 0; display: inline-block; letter-spacing: 0.3px;">'
                 f'✨ {len(filtered_list)} options below 👇'
                 f'</p>'
                 f'</div>', 

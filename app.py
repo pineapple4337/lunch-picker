@@ -112,6 +112,12 @@ st.markdown("""
             transform: translateY(-1px) !important;
             opacity: 0.9 !important;
         }
+        
+        /* Allow multi-line expander text strings to wrap beautifully */
+        div[data-testid="stExpander"] summary p {
+            white-space: pre-line !important;
+            line-height: 1.5 !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -376,7 +382,10 @@ if st.session_state.radar_matches is not None:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
             walk_time = get_walking_time_string(spot['distance'])
             
-            expander_title = f"✨ {spot['name'].lower()}  |  🚶 {spot['distance']}m ({walk_time})  |  {spot['rating']} ⭐  |  {spot['price_tier']}"
+            expander_title = (
+                f"✨ {spot['name'].lower()}\n"
+                f"🚶 {spot['distance']}m ({walk_time})  |  {spot['rating']} ⭐  |  {spot['price_tier']}"
+            )
             
             with st.expander(expander_title):
                 st.markdown(f"""

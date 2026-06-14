@@ -295,7 +295,7 @@ if st.button("🔍 search!", use_container_width=True):
                 meters_away = calculate_haversine_distance(target_lat, target_lng, spot_lat, spot_lng)
                 
                 raw_price_level = p.get("priceLevel", "PRICE_LEVEL_UNSPECIFIED")
-                price_display = "not listed"
+                price_display = "price not listed"
                 
                 if "INEXPENSIVE" in raw_price_level:
                     price_display = "$"

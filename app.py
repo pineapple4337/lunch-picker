@@ -34,30 +34,6 @@ st.markdown("""
             letter-spacing: 0.5px;
         }
         
-        /* 🎨 FULL PASTEL PINK SLIDER CUSTOMIZATION */
-        div[data-testid="stSlider"] [data-handle="true"] {
-            background-color: #ffccd5 !important;
-            border: 2px solid #ffffff !important;
-            box-shadow: 0px 2px 6px rgba(255, 204, 213, 0.6) !important;
-            border-radius: 50% !important;
-            width: 18px !important;
-            height: 18px !important;
-            top: -1px !important;
-        }
-        
-        div[data-testid="stSlider"] [data-testid="stSliderTrack"] > div > div {
-            background-color: #c97a8e !important;
-        }
-
-        div[data-testid="stSlider"] [data-testid="stSliderTooltip"] > div {
-            background-color: #fce1e4 !important;
-            color: #c97a8e !important;
-            font-size: 12px !important;
-            font-weight: 600 !important;
-            border-radius: 6px !important;
-            border: 1px solid #f9ccd2 !important;
-        }
-        
         /* Soft Pink Tag Pills */
         .tag-pill {
             display: inline-block;
@@ -82,6 +58,19 @@ st.markdown("""
             margin-bottom: 24px;
             text-align: center;
             box-shadow: 0 4px 12px rgba(255, 204, 213, 0.2);
+        }
+        
+        /* Inline Status Banner Styling */
+        .status-banner {
+            background-color: #fff5f6;
+            border: 1px dashed #ffccd5;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            color: #c97a8e;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 20px;
         }
         
         /* Expansion result cards styling */
@@ -214,6 +203,8 @@ if "radar_matches" not in st.session_state:
     st.session_state.radar_matches = None
 if "executed_vibe" not in st.session_state:
     st.session_state.executed_vibe = ""
+if "show_inline_banner" not in st.session_state:
+    st.session_state.show_inline_banner = False
 
 # =====================================================================
 # 4. MOBILE INTERACTIVE CONTROLS
@@ -226,11 +217,7 @@ unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
 dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
 
-price_tier = st.select_slider(
-    "max budget range",
-    options=["$", "$$", "$$$", "$$$$"],
-    value=("$", "$$")
-)
+# 💡 BUDGET SLIDER REMOVED FROM HERE FOR A CLEANER UI
 
 # =====================================================================
 # 5. API SEARCH WITH LOGICAL RESPONSE PROCESSING
@@ -276,7 +263,6 @@ if st.button("🔍 search!", use_container_width=True):
             }
         }
         
-        # Logged requests out to standard endpoint boundaries
         response = requests.post(url, json=payload, headers=headers)
         
         if response.status_code == 200:
@@ -330,10 +316,9 @@ if st.button("🔍 search!", use_container_width=True):
             
             filtered_list = []
             for item in processed_list:
-                # Drop anything that didn't match the tag
                 if target_vibe not in item["tags"]:
                     continue
-                # 🚫 HARD BOUNDARY: Drop anything further than 4km away (eliminates Johor, Batam, USA)
+                # 🚫 HARD BOUNDARY: Drop anything further than 4km away
                 if item["distance"] > 4000:
                     continue
                     
@@ -341,7 +326,8 @@ if st.button("🔍 search!", use_container_width=True):
                 
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
             st.session_state.radar_matches = filtered_list
-            st.toast("✨ choices loaded below!", icon="📋")
+            # Set state tracker to trigger the inline page notification banner
+            st.session_state.show_inline_banner = True
         else:
             st.error(f"API Engine Error: {response.text}")
 
@@ -351,15 +337,21 @@ if st.button("🔍 search!", use_container_width=True):
 if st.session_state.radar_matches is not None:
     st.write("---")
     
+    # 💡 INLINE NOTIFICATION: Renders natively inside the flow of the page body
+    if st.session_state.show_inline_banner and len(st.session_state.radar_matches) > 0:
+        st.markdown('<div class="status-banner">✨ choices loaded below! scroll down to view 📋</div>', unsafe_allow_html=True)
+    
     if len(st.session_state.radar_matches) == 0:
         st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within parameters")
     else:
         if st.button("🎲 roll random selection", use_container_width=True):
+            # Turn off inline notification banner when the user starts interacting with random selections
+            st.session_state.show_inline_banner = False
+            
             winner = random.choice(st.session_state.radar_matches)
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
             walk_time = get_walking_time_string(winner['distance'])
             
-            # 🎯 INJECTED PRICE DISPLAY INTO THE RANDOM SELECTOR CONTAINER BELOW
             st.markdown(f"""
                 <div class="winner-box">
                     <p style="color: #c97a8e; font-weight: 700; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">✨ chosen option!</p>
@@ -379,7 +371,6 @@ if st.session_state.radar_matches is not None:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
             walk_time = get_walking_time_string(spot['distance'])
             
-            # 🎯 INJECTED PRICE DISPLAY DIRECTLY INTO THE UNEXPANDED ROW CARD HEADER
             expander_title = f"✨ {spot['name'].lower()}  |  🚶 {spot['distance']}m ({walk_time})  |  {spot['rating']} ⭐  |  {spot['price_tier']}"
             
             with st.expander(expander_title):

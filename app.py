@@ -225,7 +225,7 @@ price_tier = st.select_slider(
 # =====================================================================
 # 5. API SEARCH WITH LOGICAL RESPONSE PROCESSING
 # =====================================================================
-if st.button("📡 search!", use_container_width=True):
+if st.button("🔍 search!", use_container_width=True):
     with st.spinner("loading..."):
         
         target_lat, target_lng = get_custom_coordinates(starting_point if starting_point else "funan mall")

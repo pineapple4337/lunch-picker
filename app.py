@@ -265,7 +265,7 @@ if st.button("🔍 search!", use_container_width=True):
         
         payload = {
             "textQuery": search_string,
-            "locationBias": {
+            "locationRestriction": {
                 "circle": {
                     "center": {
                         "latitude": target_lat, 
@@ -330,8 +330,13 @@ if st.button("🔍 search!", use_container_width=True):
             
             filtered_list = []
             for item in processed_list:
+                # Drop anything that didn't match the tag
                 if target_vibe not in item["tags"]:
                     continue
+                # 🚫 HARD BOUNDARY: Drop anything further than 4km away (eliminates Johor, Batam, USA)
+                if item["distance"] > 4000:
+                    continue
+                    
                 filtered_list.append(item)
                 
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])

@@ -34,7 +34,7 @@ st.markdown("""
             letter-spacing: 0.5px;
         }
         
-        /* 🎨 FULL PASTEL PINK SLIDER CUSTOMIZATION (TOOLTIPS RE-ENABLED & STYLED) */
+        /* 🎨 FULL PASTEL PINK SLIDER CUSTOMIZATION */
         div[data-testid="stSlider"] [data-handle="true"] {
             background-color: #ffccd5 !important;
             border: 2px solid #ffffff !important;
@@ -49,7 +49,6 @@ st.markdown("""
             background-color: #c97a8e !important;
         }
 
-        /* Styles the floating numbers above the slider handle beautifully */
         div[data-testid="stSlider"] [data-testid="stSliderTooltip"] > div {
             background-color: #fce1e4 !important;
             color: #c97a8e !important;
@@ -74,7 +73,7 @@ st.markdown("""
             border: 1px solid #ffccd5;
         }
         
-        /* Solid White Choice Container for Crisp Text Readability against Pink BG */
+        /* Solid White Choice Container */
         .winner-box {
             background-color: #ffffff;
             border: 1px solid #ffccd5;
@@ -94,7 +93,7 @@ st.markdown("""
             margin-bottom: 8px !important;
         }
         
-        /* 🛠️ COHESIVE SOLID PINK BUTTON STYLES */
+        /* COHESIVE SOLID PINK BUTTON STYLES */
         div.stButton > button:first-child, 
         div[data-testid="stFormSubmitButton"] > button {
             background-color: #fff0f1 !important;
@@ -148,6 +147,7 @@ def get_custom_coordinates(location_query):
     query_lower = location_query.lower()
     international_keywords = ["stockholm", "kth", "sweden", "malaysia", "johor", "tokyo", "japan", "london", "paris"]
     
+    # Smart check: only append "singapore" if they didn't explicitly specify a foreign location
     if not any(word in query_lower for word in international_keywords):
         full_query = f"{location_query} singapore"
     else:
@@ -252,17 +252,19 @@ if st.button("🔍 search!", use_container_width=True):
             
         st.session_state.executed_vibe = target_vibe
         
+        # Pull all official sub-categories 
         matched_google_types = [
             g_type for g_type, vibe_string in GOOGLE_TYPE_TRANSLATOR.items() 
             if vibe_string == target_vibe
         ]
         
+        # 🎯 THE VERIFIED TEXT QUERY FIX: Join options with boolean "OR" strings
+        or_joined_types = " OR ".join(matched_google_types)
         base_location = starting_point if starting_point else "funan mall"
-        search_string = f"restaurant near {base_location.lower()}"
+        search_string = f"{or_joined_types} food near {base_location.lower()}"
         
         payload = {
             "textQuery": search_string,
-            "includedPrimaryTypes": matched_google_types,  # 🎯 Fixed field name valid for searchText endpoints
             "locationBias": {
                 "circle": {
                     "center": {

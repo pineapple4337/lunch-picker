@@ -399,6 +399,9 @@ if st.session_state.radar_matches is not None:
             )
             
             with st.expander(expander_title):
+                encoded_query = requests.utils.quote(f"{spot['name']} {spot['address']}")
+                maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_query}"
+                
                 st.markdown(f"""
                     <div style="padding: 5px 0px;">
                         <p style="font-size: 13px; color: #ca948a; margin-bottom: 8px;">
@@ -407,10 +410,13 @@ if st.session_state.radar_matches is not None:
                         <div style="margin-bottom: 12px;">
                             {pills_html}
                         </div>
-                        <div style="background-color: #fffafb; border-left: 3px solid #ffccd5; padding: 10px; border-radius: 6px;">
-                            <p style="font-size: 12px; color: #c97a8e; margin: 0; font-family: monospace;">
+                        <div style="background-color: #fffafb; border-left: 3px solid #ffccd5; padding: 10px; border-radius: 6px; position: relative;">
+                            <p style="font-size: 12px; color: #c97a8e; margin: 0 0 4px 0; font-family: monospace;">
                                 📍 {spot['address'].lower()}
                             </p>
+                            <a href="{maps_url}" target="_blank" style="font-size: 11px; color: #ca948a; font-weight: 600; text-decoration: underline; display: inline-block; margin-top: 2px;">
+                                🗺️ view on google maps
+                            </a>
                         </div>
                     </div>
                 """, unsafe_allow_html=True)

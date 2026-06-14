@@ -118,6 +118,14 @@ st.markdown("""
             white-space: pre-line !important;
             line-height: 1.5 !important;
         }
+        
+        /* Forces expander titles to respect string line breaks beautifully on mobile viewports */
+        div[data-testid="stExpander"] summary p {
+            white-space: pre-line !important;
+            line-height: 1.4 !important;
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -338,11 +346,13 @@ if st.button("🔍 search!", use_container_width=True):
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
             st.session_state.radar_matches = filtered_list
 
-            # 💡 Minimalist inline status text directly underneath the button
+            # 💡 Wrap message safely with positive padding so layout blocks stack normally
             st.markdown(
-                f'<p style="color: #c97a8e; font-size: 13px; font-weight: 500; text-align: center; margin-top: 10px; margin-bottom: -10px;">'
+                f'<div style="width: 100%; text-align: center; padding: 12px 0 4px 0; clear: both;">'
+                f'<p style="color: #c97a8e; font-size: 13px; font-weight: 600; margin: 0; display: inline-block;">'
                 f'✨ found {len(filtered_list)} options near your location below! 📋👇'
-                f'</p>', 
+                f'</p>'
+                f'</div>', 
                 unsafe_allow_html=True
             )
         else:

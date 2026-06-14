@@ -34,7 +34,7 @@ st.markdown("""
             letter-spacing: 0.5px;
         }
         
-        /* 🎨 FULL PASTEL PINK SLIDER CUSTOMIZATION (TOOLTIPS RE-ENABLED & STYLED) */
+        /* 🎨 FULL PASTEL PINK SLIDER CUSTOMIZATION */
         div[data-testid="stSlider"] [data-handle="true"] {
             background-color: #ffccd5 !important;
             border: 2px solid #ffffff !important;
@@ -49,7 +49,6 @@ st.markdown("""
             background-color: #c97a8e !important;
         }
 
-        /* Styles the floating numbers above the slider handle beautifully */
         div[data-testid="stSlider"] [data-testid="stSliderTooltip"] > div {
             background-color: #fce1e4 !important;
             color: #c97a8e !important;
@@ -74,7 +73,7 @@ st.markdown("""
             border: 1px solid #ffccd5;
         }
         
-        /* Solid White Choice Container for Crisp Text Readability against Pink BG */
+        /* Solid White Choice Container */
         .winner-box {
             background-color: #ffffff;
             border: 1px solid #ffccd5;
@@ -94,7 +93,7 @@ st.markdown("""
             margin-bottom: 8px !important;
         }
         
-        /* 🛠️ COHESIVE SOLID PINK BUTTON STYLES */
+        /* COHESIVE SOLID PINK BUTTON STYLES */
         div.stButton > button:first-child, 
         div[data-testid="stFormSubmitButton"] > button {
             background-color: #fff0f1 !important;
@@ -144,7 +143,19 @@ def get_custom_coordinates(location_query):
         "X-Goog-Api-Key": API_KEY,
         "X-Goog-FieldMask": "places.location"
     }
-    geo_payload = {"textQuery": f"{location_query} singapore"}
+    
+    query_lower = location_query.lower()
+    international_keywords = ["stockholm", "kth", "sweden", "malaysia", "johor", "tokyo", "japan", "london", "paris", "europe"]
+    local_anchors = ["condo", "singapore", "mrt", "mall", "road", "street", "hdb", "avenue", "clove"]
+    
+    if any(inter_word in query_lower for inter_word in international_keywords):
+        full_query = location_query
+    elif any(local_word in query_lower for local_word in local_anchors):
+        full_query = f"{location_query} singapore" if "singapore" not in query_lower else location_query
+    else:
+        full_query = f"{location_query} condo singapore"
+        
+    geo_payload = {"textQuery": full_query}
     
     try:
         geo_resp = requests.post(geo_url, json=geo_payload, headers=geo_headers, timeout=5.0)
@@ -171,7 +182,6 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
     return int(radius * c)
 
 def get_walking_time_string(distance_meters):
-    """Calculates human walking time (approx 80 meters per min) entirely for free inside Python"""
     minutes = math.ceil(distance_meters / 80)
     if minutes <= 1:
         return "~1 min walk"
@@ -243,10 +253,15 @@ if st.button("🔍 search!", use_container_width=True):
             target_vibe = selected_vibe
             
         st.session_state.executed_vibe = target_vibe
-        clean_vibe_name = target_vibe.split('  ')[0]
         
+        matched_google_types = [
+            g_type for g_type, vibe_string in GOOGLE_TYPE_TRANSLATOR.items() 
+            if vibe_string == target_vibe
+        ]
+        
+        or_joined_types = " OR ".join(matched_google_types)
         base_location = starting_point if starting_point else "funan mall"
-        search_string = f"{clean_vibe_name} food near {base_location.lower()} singapore"
+        search_string = f"{or_joined_types} food near {base_location.lower()}"
         
         payload = {
             "textQuery": search_string,
@@ -261,6 +276,7 @@ if st.button("🔍 search!", use_container_width=True):
             }
         }
         
+        # Logged requests out to standard endpoint boundaries
         response = requests.post(url, json=payload, headers=headers)
         
         if response.status_code == 200:
@@ -269,7 +285,7 @@ if st.button("🔍 search!", use_container_width=True):
             
             for p in places:
                 name = p.get("displayName", {}).get("text", "Unknown")
-                address = p.get("formattedAddress", "Singapore")
+                address = p.get("formattedAddress", "unlisted location")
                 rating = p.get("rating", "N/A")
                 
                 spot_loc = p.get("location", {})
@@ -314,15 +330,12 @@ if st.button("🔍 search!", use_container_width=True):
             
             filtered_list = []
             for item in processed_list:
-                # UX Choice: Keep unrated places visible so popular options don't break/vanish
                 if target_vibe not in item["tags"]:
                     continue
                 filtered_list.append(item)
                 
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
             st.session_state.radar_matches = filtered_list
-            
-            # 💡 UX SOLUTION: Triggers an instant user toast guide to notify that results are loaded below
             st.toast("✨ choices loaded below!", icon="📋")
         else:
             st.error(f"API Engine Error: {response.text}")
@@ -341,13 +354,13 @@ if st.session_state.radar_matches is not None:
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
             walk_time = get_walking_time_string(winner['distance'])
             
-            # 💡 UX SOLUTION: Expanded winner card instantly printing distance, walk estimation and clean location address
+            # 🎯 INJECTED PRICE DISPLAY INTO THE RANDOM SELECTOR CONTAINER BELOW
             st.markdown(f"""
                 <div class="winner-box">
                     <p style="color: #c97a8e; font-weight: 700; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">✨ chosen option!</p>
                     <p class="restaurant-name" style="font-size: 24px !important; color: #5c4d50; font-weight:700;">{winner['name'].lower()}</p>
                     <p style="margin: 8px 0;">{tag_pills}</p>
-                    <p style="font-size: 14px; color: #ca948a; margin: 0;"><b>dist:</b> {winner['distance']}m ({walk_time}) | <b>rating:</b> {winner['rating']} ⭐</p>
+                    <p style="font-size: 14px; color: #ca948a; margin: 0;"><b>dist:</b> {winner['distance']}m ({walk_time}) | <b>rating:</b> {winner['rating']} ⭐ | <b>price:</b> {winner['price_tier']}</p>
                     <p style="font-size: 12px; color: #ca948a; margin-top: 5px;"><b>status:</b> {winner['status']}</p>
                     <div style="background-color: #fffafb; border: 1px dashed #ffccd5; padding: 8px; border-radius: 6px; margin-top: 10px;">
                         <p style="font-size: 11px; color: #c97a8e; margin: 0; font-family: monospace;">📍 {winner['address'].lower()}</p>
@@ -361,8 +374,8 @@ if st.session_state.radar_matches is not None:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
             walk_time = get_walking_time_string(spot['distance'])
             
-            # Displays exact walking minutes directly alongside the card header title
-            expander_title = f"✨ {spot['name'].lower()}  |  🚶 {spot['distance']}m ({walk_time})  |  {spot['rating']} ⭐"
+            # 🎯 INJECTED PRICE DISPLAY DIRECTLY INTO THE UNEXPANDED ROW CARD HEADER
+            expander_title = f"✨ {spot['name'].lower()}  |  🚶 {spot['distance']}m ({walk_time})  |  {spot['rating']} ⭐  |  {spot['price_tier']}"
             
             with st.expander(expander_title):
                 st.markdown(f"""

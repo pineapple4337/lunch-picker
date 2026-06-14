@@ -342,7 +342,7 @@ if st.button("🔍 search!", use_container_width=True):
             st.markdown(
                 f'<div style="text-align: center; width: 100%; margin-top: -8px; margin-bottom: 12px; clear: both;">'
                 f'<p style="color: #c97a8e; font-size: 14px; font-weight: 600; margin: 0; display: inline-block; letter-spacing: 0.3px;">'
-                f'✨ {len(filtered_list)} options below 👇'
+                f'{len(filtered_list)} options below 👇'
                 f'</p>'
                 f'</div>', 
                 unsafe_allow_html=True

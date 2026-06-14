@@ -144,7 +144,17 @@ def get_custom_coordinates(location_query):
         "X-Goog-Api-Key": API_KEY,
         "X-Goog-FieldMask": "places.location"
     }
-    geo_payload = {"textQuery": f"{location_query} singapore"}
+    
+    # Smart check: only append "singapore" if they didn't explicitly specify an overseas spot
+    query_lower = location_query.lower()
+    international_keywords = ["stockholm", "sweden", "kl", "johor", "malaysia", "tokyo", "japan", "london", "paris"]
+    
+    if not any(word in query_lower for word in international_keywords):
+        full_query = f"{location_query} singapore"
+    else:
+        full_query = location_query
+        
+    geo_payload = {"textQuery": full_query}
     
     try:
         geo_resp = requests.post(geo_url, json=geo_payload, headers=geo_headers, timeout=5.0)
@@ -171,7 +181,6 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
     return int(radius * c)
 
 def get_walking_time_string(distance_meters):
-    """Calculates human walking time (approx 80 meters per min) entirely for free inside Python"""
     minutes = math.ceil(distance_meters / 80)
     if minutes <= 1:
         return "~1 min walk"
@@ -195,7 +204,7 @@ GOOGLE_TYPE_TRANSLATOR = {
     "spanish_restaurant": "western  🍕 🥩 🍝", "mediterranean_restaurant": "western  🍕 🥩 🍝", "european_restaurant": "western  🍕 🥩 🍝", "bistro": "western  🍕 🥩 🍝", "diner": "western  🍕 🥩 🍝",
     "cafe": "cafe & snacks  🧋 🍩 🍵", "coffee_shop": "cafe & snacks  🧋 🍩 🍵", "coffee_roastery": "cafe & snacks  🧋 🍩 🍵", "coffee_stand": "cafe & snacks  🧋 🍩 🍵",
     "tea_house": "cafe & snacks  🧋 🍩 🍵", "juice_shop": "cafe & snacks  🧋 🍩 🍵", "acai_shop": "cafe & snacks  🧋 🍩 🍵", "cafeteria": "cafe & snacks  🧋 🍩 🍵",
-    "bakery": "cafe & snacks  🧋 🍩 🍵", "cake_shop": "cafe & snacks  🧋 🍩 🍵", "pastry_shop": "cafe & snacks  🧋 🍩 🍵", "dessert_restaurant": "cafe & snacks  🧋 🍩 🍵",
+    "bakery": "cafe & snacks  🧋 🍩 🍵", "cake_shop": "cafe & snacks  🧋 🍩 定期", "pastry_shop": "cafe & snacks  🧋 🍩 🍵", "dessert_restaurant": "cafe & snacks  🧋 🍩 🍵",
     "dessert_shop": "cafe & snacks  🧋 🍩 🍵", "ice_cream_shop": "cafe & snacks  🧋 🍩 🍵", "donut_shop": "cafe & snacks  🧋 🍩 🍵", "chocolate_shop": "cafe & snacks  🧋 🍩 🍵", "confectionery": "cafe & snacks  🧋 🍩 🍵",
     "vegan_restaurant": "vegetarian / salad  🥗 🥑 🥦", "vegetarian_restaurant": "vegetarian / salad  🥗 🥑 🥦", "salad_shop": "vegetarian / salad  🥗 🥑 🥦"
 }
@@ -243,13 +252,20 @@ if st.button("🔍 search!", use_container_width=True):
             target_vibe = selected_vibe
             
         st.session_state.executed_vibe = target_vibe
-        clean_vibe_name = target_vibe.split('  ')[0]
         
+        # Reverse map to grab EVERY single official database type associated with this tag
+        matched_google_types = [
+            g_type for g_type, vibe_string in GOOGLE_TYPE_TRANSLATOR.items() 
+            if vibe_string == target_vibe
+        ]
+        
+        # Generic anchor text query so keyword bias doesn't force a preference
         base_location = starting_point if starting_point else "funan mall"
-        search_string = f"{clean_vibe_name} food near {base_location.lower()} singapore"
+        search_string = f"restaurant near {base_location.lower()}"
         
         payload = {
             "textQuery": search_string,
+            "includedTypes": matched_google_types,  # 🎯 Structural database filtering matches all types equally
             "locationBias": {
                 "circle": {
                     "center": {
@@ -269,7 +285,7 @@ if st.button("🔍 search!", use_container_width=True):
             
             for p in places:
                 name = p.get("displayName", {}).get("text", "Unknown")
-                address = p.get("formattedAddress", "Singapore")
+                address = p.get("formattedAddress", "unlisted location")
                 rating = p.get("rating", "N/A")
                 
                 spot_loc = p.get("location", {})
@@ -314,15 +330,12 @@ if st.button("🔍 search!", use_container_width=True):
             
             filtered_list = []
             for item in processed_list:
-                # UX Choice: Keep unrated places visible so popular options don't break/vanish
                 if target_vibe not in item["tags"]:
                     continue
                 filtered_list.append(item)
                 
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
             st.session_state.radar_matches = filtered_list
-            
-            # 💡 UX SOLUTION: Triggers an instant user toast guide to notify that results are loaded below
             st.toast("✨ choices loaded below!", icon="📋")
         else:
             st.error(f"API Engine Error: {response.text}")
@@ -341,7 +354,6 @@ if st.session_state.radar_matches is not None:
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
             walk_time = get_walking_time_string(winner['distance'])
             
-            # 💡 UX SOLUTION: Expanded winner card instantly printing distance, walk estimation and clean location address
             st.markdown(f"""
                 <div class="winner-box">
                     <p style="color: #c97a8e; font-weight: 700; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">✨ chosen option!</p>
@@ -361,7 +373,6 @@ if st.session_state.radar_matches is not None:
             pills_html = "".join([f'<span class="tag-pill">{tag}</span>' for tag in spot["tags"]])
             walk_time = get_walking_time_string(spot['distance'])
             
-            # Displays exact walking minutes directly alongside the card header title
             expander_title = f"✨ {spot['name'].lower()}  |  🚶 {spot['distance']}m ({walk_time})  |  {spot['rating']} ⭐"
             
             with st.expander(expander_title):
@@ -380,3 +391,5 @@ if st.session_state.radar_matches is not None:
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
+
+}

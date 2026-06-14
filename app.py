@@ -414,7 +414,7 @@ if st.session_state.radar_matches is not None:
                             <p style="font-size: 12px; color: #c97a8e; margin: 0 0 4px 0; font-family: monospace;">
                                 📍 {spot['address'].lower()}
                             </p>
-                            <a href="{maps_url}" target="_blank" style="font-size: 11px; color: #ca948a; font-weight: 600; text-decoration: underline; display: inline-block; margin-top: 2px;">
+                            <a href="{maps_url}" target="_blank" style="font-size: 12px; color: #ca948a; font-weight: 600; text-decoration: underline; display: inline-block; margin-top: 2px;">
                                 🗺️ view on google maps
                             </a>
                         </div>

@@ -352,7 +352,7 @@ if st.button("🔍 search!", use_container_width=True):
                 f'width: 100%; padding: 18px 0px 18px 0px; margin: 0 auto; clear: both;">'
                 f'<p style="color: #c97a8e; font-size: 13px; font-weight: 600; margin: 0; '
                 f'line-height: 1; text-align: center; letter-spacing: 0.2px;">'
-                f'✨ found {len(filtered_list)} options near your location below! 📋👇'
+                f'✨ {len(filtered_list)} options below 👇'
                 f'</p>'
                 f'</div>', 
                 unsafe_allow_html=True

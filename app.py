@@ -265,7 +265,7 @@ if st.button("🔍 search!", use_container_width=True):
         
         payload = {
             "textQuery": search_string,
-            "locationRestriction": {
+            "locationBias": {
                 "circle": {
                     "center": {
                         "latitude": target_lat, 

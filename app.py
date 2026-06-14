@@ -60,17 +60,22 @@ st.markdown("""
             box-shadow: 0 4px 12px rgba(255, 204, 213, 0.2);
         }
         
-        /* Inline Status Banner Styling */
+        /* Inline Status Banner Styling - Distinct Pop Out Edition */
         .status-banner {
-            background-color: #fff5f6;
-            border: 1px dashed #ffccd5;
-            padding: 12px;
-            border-radius: 10px;
+            background-color: #fce1e4;
+            border-left: 5px solid #c97a8e;
+            border-top: 1px solid #f9ccd2;
+            border-right: 1px solid #f9ccd2;
+            border-bottom: 1px solid #f9ccd2;
+            padding: 14px 12px;
+            border-radius: 6px;
             text-align: center;
-            color: #c97a8e;
+            color: #5c4d50;
             font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 6px rgba(201, 122, 142, 0.1);
         }
         
         /* Expansion result cards styling */
@@ -339,8 +344,8 @@ if st.session_state.radar_matches is not None:
     
     # 💡 INLINE NOTIFICATION: Renders natively inside the flow of the page body
     if st.session_state.show_inline_banner and len(st.session_state.radar_matches) > 0:
-        st.markdown('<div class="status-banner">✨ choices loaded below! scroll down to view 📋</div>', unsafe_allow_html=True)
-    
+        st.markdown('<div class="status-banner">results found! scroll down for the list 👇</div>', unsafe_allow_html=True)
+        
     if len(st.session_state.radar_matches) == 0:
         st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within parameters")
     else:

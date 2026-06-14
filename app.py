@@ -370,9 +370,14 @@ if st.session_state.radar_matches is not None:
             # Turn off inline notification banner when the user starts interacting with random selections
             st.session_state.show_inline_banner = False
             
+            if st.button("🎲 roll random selection", use_container_width=True):
             winner = random.choice(st.session_state.radar_matches)
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
             walk_time = get_walking_time_string(winner['distance'])
+            
+            # 🗺️ Formulate the free browser link for the winner selection
+            encoded_winner_query = requests.utils.quote(f"{winner['name']} {winner['address']}")
+            winner_maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_winner_query}"
             
             st.markdown(f"""
                 <div class="winner-box">
@@ -381,8 +386,11 @@ if st.session_state.radar_matches is not None:
                     <p style="margin: 8px 0;">{tag_pills}</p>
                     <p style="font-size: 14px; color: #ca948a; margin: 0;"><b>dist:</b> {winner['distance']}m ({walk_time}) | <b>rating:</b> {winner['rating']} ⭐ | <b>price:</b> {winner['price_tier']}</p>
                     <p style="font-size: 12px; color: #ca948a; margin-top: 5px;"><b>status:</b> {winner['status']}</p>
-                    <div style="background-color: #fffafb; border: 1px dashed #ffccd5; padding: 8px; border-radius: 6px; margin-top: 10px;">
-                        <p style="font-size: 11px; color: #c97a8e; margin: 0; font-family: monospace;">📍 {winner['address'].lower()}</p>
+                    <div style="background-color: #fffafb; border: 1px dashed #ffccd5; padding: 10px; border-radius: 6px; margin-top: 10px; position: relative;">
+                        <p style="font-size: 11px; color: #c97a8e; margin: 0 0 4px 0; font-family: monospace;">📍 {winner['address'].lower()}</p>
+                        <a href="{winner_maps_url}" target="_blank" style="font-size: 11px; color: #ca948a; font-weight: 600; text-decoration: underline; display: inline-block; margin-top: 2px;">
+                            🗺️ view on google maps
+                        </a>
                     </div>
                 </div>
             """, unsafe_allow_html=True)

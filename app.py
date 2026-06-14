@@ -390,7 +390,7 @@ if st.session_state.radar_matches is not None:
             walk_time = get_walking_time_string(spot['distance'])
             
             expander_title = (
-                f"✨ {spot['name'].lower()}\n"
+                f"📍 {spot['name'].lower()}\n"
                 f"🚶 {spot['distance']}m ({walk_time})  |  {spot['rating']} ⭐  |  {spot['price_tier']}"
             )
             

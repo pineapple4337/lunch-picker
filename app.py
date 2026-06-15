@@ -229,18 +229,18 @@ def generate_discussion_topic():
         Read this headline: "{headline}"
         
         Tasks:
-        1. Write a single, brief, direct sentence identifying the core structural or ethical problem behind it. No filler words.
-        2. Formulate one highly succinct, open-ended debate question for university students. Keep it punchy and short.
+        1. Write a single, brief, direct sentence identifying the core structural or ethical problem behind it. No filler words. Enforce strict lowercase.
+        2. Formulate one highly succinct, open-ended debate question for university students. Keep it punchy and short. Enforce strict lowercase.
         
-        Format your response exactly like this template (keep all text lowercase):
+        Format your response exactly like this template (labels must remain lowercase):
         📰 headline:
-        '{headline.lower()}'
+        {headline}
         
         to ponder:
-        [Insert the single brief sentence here]
+        [Insert the single brief sentence here in all lowercase]
         
         question:
-        [Insert the short debate question here]
+        [Insert the short debate question here in all lowercase]
         """
         
         response = client.models.generate_content(
@@ -497,10 +497,8 @@ with st.sidebar:
         
     st.markdown(
         f"""
-        <div style="background-color: #ffffff; border: 1px solid #ffccd5; border-left: 4px solid #c97a8e; padding: 14px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 6px rgba(255, 204, 213, 0.15);">
-            <p style="font-size: 12px; color: #5c4d50; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">
-                {st.session_state.current_topic}
-            </p>
+        <div style="background-color: #ffffff; border: 1px solid #ffccd5; border-left: 4px solid #c97a8e; padding: 14px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 6px rgba(255, 204, 213, 0.15); font-size: 13px; color: #5c4d50; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">
+            {st.session_state.current_topic}
         </div>
         """, 
         unsafe_allow_html=True

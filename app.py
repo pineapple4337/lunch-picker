@@ -193,10 +193,10 @@ def get_walking_time_string(distance_meters):
 
 def generate_discussion_topic():
     fallback_topics = [
-        "⚖️ ETHICS: If a self-driving car must choose between hitting a group of elderly pedestrians or a single young child, how should the algorithm calculate the value of a life? Who bears moral responsibility?",
-        "🏫 UNI LIFE: Is the modern university system primarily an institution for genuine intellectual growth, or has it just devolved into an expensive, multi-year compliance test to signal capability to employers?",
-        "👁️ SOCIETY: If total global surveillance could permanently eradicate all violent crime overnight at the cost of absolute personal privacy, is that a trade-off a civilized society should accept?",
-        "🧠 ETHICS: If memory-wiping technology existed to perfectly erase traumatic events or painful breakups without physical side effects, is it ethically sound to use it, or do we fundamentally need our pain to remain human?"
+        "If a self-driving car must choose between hitting a group of elderly pedestrians or a single young child, how should the algorithm calculate the value of a life? Who bears moral responsibility?",
+        "Is the modern university system primarily an institution for genuine intellectual growth, or has it just devolved into an expensive, multi-year compliance test to signal capability to employers?",
+        "If total global surveillance could permanently eradicate all violent crime overnight at the cost of absolute personal privacy, is that a trade-off a civilized society should accept?",
+        "If memory-wiping technology existed to perfectly erase traumatic events or painful breakups without physical side effects, is it ethically sound to use it, or do we fundamentally need our pain to remain human?"
     ]
     
     try:
@@ -494,12 +494,12 @@ if st.session_state.radar_matches is not None:
 # 7. SIDEBAR FEATURE: MORNING TOPIC GENERATOR
 # =====================================================================
 with st.sidebar:
-    st.markdown("<h2 style='color: #c97a8e;'>☕ morning discussion</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #c97a8e;'>☀️ morning discussion</h2>", unsafe_allow_html=True)
     
     if "current_topic" not in st.session_state:
         st.session_state.current_topic = "click the button above for a random topic!"
         
-    if st.button("☕ brew morning topic", use_container_width=True):
+    if st.button("random morning topic", use_container_width=True):
         st.session_state.current_topic = generate_discussion_topic()
         
     st.markdown(

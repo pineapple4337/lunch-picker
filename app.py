@@ -203,7 +203,7 @@ def generate_discussion_topic():
     ]
     
     try:
-        feed = feedparser.parse("https://www.channelnewsasia.com/rssfeeds/8395846") 
+        feed = feedparser.parse("https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=10416") 
         if feed.entries:
             random_entry = random.choice(feed.entries[:10])
             title = random_entry.title.lower()

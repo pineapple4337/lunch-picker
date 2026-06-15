@@ -246,6 +246,7 @@ def generate_discussion_topic():
         <br><br>
         question:
         [Insert the short debate question here in all lowercase]
+        <br><br>
         """
         
         response = client.models.generate_content(

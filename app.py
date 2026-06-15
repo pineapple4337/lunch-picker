@@ -497,7 +497,7 @@ with st.sidebar:
     st.markdown("<h2 style='color: #c97a8e;'>☕ morning discussion</h2>", unsafe_allow_html=True)
     
     if "current_topic" not in st.session_state:
-        st.session_state.current_topic = "click the button below for a random topic!"
+        st.session_state.current_topic = "click the button above for a random topic!"
         
     if st.button("☕ brew morning topic", use_container_width=True):
         st.session_state.current_topic = generate_discussion_topic()

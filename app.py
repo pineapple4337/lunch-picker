@@ -232,10 +232,10 @@ def generate_discussion_topic():
         1. Write a single, brief, direct sentence identifying the core structural or ethical problem behind it. No filler words. Enforce strict lowercase.
         2. Formulate one highly succinct, open-ended debate question for university students. Keep it punchy and short. Enforce strict lowercase.
         
-        Format your response exactly like this template (labels must remain lowercase), leave a line break between the headline and 'to ponder':
+        Format your response exactly like this template (labels must remain lowercase):
         📰 headline:
         {headline}
-
+        ---
         to ponder:
         [Insert the single brief sentence here in all lowercase]
         
@@ -250,7 +250,8 @@ def generate_discussion_topic():
         )
         
         if response.text:
-            return f"{response.text.strip()}\n\n🔗 Source: {article_link}"
+            cleaned_text = response.text.replace("---", "\n")
+            return f"{cleaned_text.strip()}\n\n🔗 Source: {article_link}"
             
     except Exception as e:
         st.sidebar.caption(f"🔧 debug diagnostic flag: {e}")

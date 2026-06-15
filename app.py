@@ -206,7 +206,7 @@ def generate_discussion_topic():
         
     try:
         # Pull from the standard primary outbound top stories feed which always stays functional
-        feed = feedparser.parse("https://www.channelnewsasia.com/rssfeeds/8395846")
+        feed = feedparser.parse("https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=10416")
         if not feed.entries:
             return random.choice(fallback_topics)
             

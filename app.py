@@ -225,6 +225,12 @@ def generate_discussion_topic():
             "You must strictly use British English spelling (e.g., analyse, behaviour, programme, characterised)."
         )
         
+        system_instruction = (
+            "You are an academic debate moderator creating ultra-short icebreakers for university students. "
+            "Your tone is direct, sharp, objective, and clear. Avoid dramatic, flowery, or bombastic language. "
+            "You must strictly use British English spelling (e.g., analyse, behaviour, programme, characterised)."
+        )
+        
         prompt_payload = f"""
         Read this headline: "{headline}"
         
@@ -232,10 +238,9 @@ def generate_discussion_topic():
         1. Write a single, brief, direct sentence identifying the core structural or ethical problem behind it. No filler words. Enforce strict lowercase.
         2. Formulate one highly succinct, open-ended debate question for university students. Keep it punchy and short. Enforce strict lowercase.
         
-        Format your response exactly like this template (labels must remain lowercase):
+        Format your response exactly like this template (labels must remain lowercase). You must include a literal <br><br> tag exactly where indicated below to separate the elements:
         📰 headline:
-        {headline}
-        ---
+        {headline}<br><br>
         to ponder:
         [Insert the single brief sentence here in all lowercase]
         

@@ -193,13 +193,13 @@ def get_walking_time_string(distance_meters):
 
 def generate_discussion_topic():
     fallback_topics = [
-        "⚖️ ETHICS: If a self-driving car must choose between hitting a group of elderly pedestrians or a single young child, how should the algorithm calculate the value of a life? Who bears moral responsibility?",
-        "🏫 UNI LIFE: Is the modern university system primarily an institution for genuine intellectual growth, or has it just devolved into an expensive, multi-year compliance test to signal capability to employers?",
-        "👁️ SOCIETY: If total global surveillance could permanently eradicate all violent crime overnight at the cost of absolute personal privacy, is that a trade-off a civilized society should accept?",
-        "🧠 ETHICS: If memory-wiping technology existed to perfectly erase traumatic events or painful breakups without physical side effects, is it ethically sound to use it, or do we fundamentally need our pain to remain human?",
-        "🌌 PHILOSOPHY: If humanity successfully builds a conscious, sentient artificial intelligence, should it automatically inherit human rights, or is a machine inherently property regardless of how deeply it can feel?",
-        "🎨 SOCIETY: Has modern social media culture completely killed true counter-cultures and subcultures by instantly commercializing and optimizing every unique human hobby into a mainstream algorithm aesthetic?",
-        "⏳ ETHICS: If life-extension technology allows humans to live healthy lives up to 200 years old, should it be heavily regulated or capped to prevent absolute societal stagnation and catastrophic generational wealth gaps?"
+        "If a self-driving car must choose between hitting a group of elderly pedestrians or a single young child, how should the algorithm calculate the value of a life? Who bears moral responsibility?",
+        "Is the modern university system primarily an institution for genuine intellectual growth, or has it just devolved into an expensive, multi-year compliance test to signal capability to employers?",
+        "If total global surveillance could permanently eradicate all violent crime overnight at the cost of absolute personal privacy, is that a trade-off a civilized society should accept?",
+        "If memory-wiping technology existed to perfectly erase traumatic events or painful breakups without physical side effects, is it ethically sound to use it, or do we fundamentally need our pain to remain human?",
+        "If humanity successfully builds a conscious, sentient artificial intelligence, should it automatically inherit human rights, or is a machine inherently property regardless of how deeply it can feel?",
+        "Has modern social media culture completely killed true counter-cultures and subcultures by instantly commercialising and optimising every unique human hobby into a mainstream algorithm aesthetic?",
+        "If life-extension technology allows humans to live healthy lives up to 200 years old, should it be heavily regulated or capped to prevent absolute societal stagnation and catastrophic generational wealth gaps?"
     ]
     
     try:
@@ -458,11 +458,10 @@ if st.session_state.radar_matches is not None:
 # 7. SIDEBAR FEATURE: UNIVERSITY & ETHICS MORNING TOPIC GENERATOR
 # =====================================================================
 with st.sidebar:
-    st.markdown("<h2 style='color: #c97a8e;'>☕ discussion lounge</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size: 13px; color: #ca948a;'>brew a deep conversation starter for the morning.</p>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #c97a8e;'>☕ morning discussion</h2>", unsafe_allow_html=True)
     
     if "current_topic" not in st.session_state:
-        st.session_state.current_topic = "click the button below to brew a topic!"
+        st.session_state.current_topic = "click the button below for a random topic!"
         
     if st.button("☕ brew morning topic", use_container_width=True):
         st.session_state.current_topic = generate_discussion_topic()

@@ -193,35 +193,66 @@ def get_walking_time_string(distance_meters):
 
 def generate_discussion_topic():
     fallback_topics = [
-        "If a self-driving car must choose between hitting a group of elderly pedestrians or a single young child, how should the algorithm calculate the value of a life? Who bears moral responsibility?",
-        "Is the modern university system primarily an institution for genuine intellectual growth, or has it just devolved into an expensive, multi-year compliance test to signal capability to employers?",
-        "If total global surveillance could permanently eradicate all violent crime overnight at the cost of absolute personal privacy, is that a trade-off a civilized society should accept?",
-        "If memory-wiping technology existed to perfectly erase traumatic events or painful breakups without physical side effects, is it ethically sound to use it, or do we fundamentally need our pain to remain human?",
-        "If humanity successfully builds a conscious, sentient artificial intelligence, should it automatically inherit human rights, or is a machine inherently property regardless of how deeply it can feel?",
-        "Has modern social media culture completely killed true counter-cultures and subcultures by instantly commercialising and optimising every unique human hobby into a mainstream algorithm aesthetic?",
-        "If life-extension technology allows humans to live healthy lives up to 200 years old, should it be heavily regulated or capped to prevent absolute societal stagnation and catastrophic generational wealth gaps?"
+        "⚖️ ETHICS: If a self-driving car must choose between hitting a group of elderly pedestrians or a single young child, how should the algorithm calculate the value of a life? Who bears moral responsibility?",
+        "🏫 UNI LIFE: Is the modern university system primarily an institution for genuine intellectual growth, or has it just devolved into an expensive, multi-year compliance test to signal capability to employers?",
+        "👁️ SOCIETY: If total global surveillance could permanently eradicate all violent crime overnight at the cost of absolute personal privacy, is that a trade-off a civilized society should accept?",
+        "🧠 ETHICS: If memory-wiping technology existed to perfectly erase traumatic events or painful breakups without physical side effects, is it ethically sound to use it, or do we fundamentally need our pain to remain human?"
     ]
     
     try:
-        feed = feedparser.parse("https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6561") 
-        if feed.entries:
-            random_entry = random.choice(feed.entries[:10])
-            title = random_entry.title.lower()
-            link = random_entry.link
+        from google import genai
+    except ImportError:
+        return random.choice(fallback_topics)
+        
+    try:
+        # Pull from the standard primary outbound top stories feed which always stays functional
+        feed = feedparser.parse("https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml")
+        if not feed.entries:
+            return random.choice(fallback_topics)
             
-            templates = [
-                f"📰 NEWS HEADLINE:\n'{title}'\n\n🤔 ETHICAL DILEMMA:\nDoes this situation represent a failure of individual moral responsibility, or is it a systemic issue engineered by modern societal structures? How do we fix it?",
-                
-                f"📰 NEWS HEADLINE:\n'{title}'\n\n💬 DEEP CONVO Starter:\nIf you were tasked to write a university ethics thesis addressing this exact headline, what is the most controversial yet logically defensible stance you could take?",
-                
-                f"📰 NEWS HEADLINE:\n'{title}'\n\n🌍 SOCIETAL VIEWPOINT:\nHow do you think our generation views this specific event compared to our parents' generation? Is there a fundamental shift in core human values happening right here?"
-            ]
+        random_entry = random.choice(feed.entries[:12])
+        headline = random_entry.title
+        article_link = random_entry.link
+        
+        if "GEMINI_API_KEY" not in st.secrets:
+            return f"⚠️ Missing GEMINI_API_KEY in Streamlit Secrets!\n\nFound Headline: '{headline}'"
             
-            chosen_prompt = random.choice(templates)
-            return f"{chosen_prompt}\n\n🔗 Source: {link}"
+        client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+        
+        system_instruction = (
+            "You are an elite academic debate moderator creating icebreakers for brilliant university students. "
+            "Your tone is intellectual, sharp, existential, and slightly witty. No corporate buzzwords or HR talk."
+        )
+        
+        prompt_payload = f"""
+        Read this real live news headline: "{headline}"
+        
+        Tasks:
+        1. Write a short 1-sentence analytical summary showing the deeper structural, ethical, or human issue behind this headline.
+        2. Formulate one profound, open-ended, spicy philosophical dilemma question inspired by it that university students would argue about over coffee.
+        
+        Format your response exactly like this template (keep all text lowercase except labels):
+        📰 TRENDING TOPIC:
+        '{headline.lower()}'
+        
+        🤔 THE DEEPER DILEMMA:
+        [Insert your 1-sentence analysis here]
+        
+        💬 DISCUSSION STARTER:
+        [Insert your deep philosophical debate question here]
+        """
+        
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt_payload,
+            config={"system_instruction": system_instruction, "temperature": 0.85}
+        )
+        
+        if response.text:
+            return f"{response.text.strip()}\n\n🔗 Source: {article_link}"
             
-    except Exception:
-        st.sidebar.error(f"Network error debug info: {e}")
+    except Exception as e:
+        st.sidebar.caption(f"🔧 debug diagnostic flag: {e}")
         
     return random.choice(fallback_topics)
 
@@ -366,7 +397,6 @@ if st.button("🔍 search!", use_container_width=True):
             for item in processed_list:
                 if target_vibe not in item["tags"]:
                     continue
-                # 🚫 HARD BOUNDARY: Drop anything further than 4km away
                 if item["distance"] > 4000:
                     continue
                     
@@ -375,7 +405,6 @@ if st.button("🔍 search!", use_container_width=True):
             filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
             st.session_state.radar_matches = filtered_list
             
-            # 🎯 Counter-balance Streamlit's structural block layout gaps
             st.markdown(
                 f'<div style="text-align: center; width: 100%; margin-top: -8px; margin-bottom: 12px; clear: both;">'
                 f'<p style="color: #c97a8e; font-size: 14px; font-weight: 600; margin: 0; display: inline-block; letter-spacing: 0.3px;">'
@@ -400,7 +429,6 @@ if st.session_state.radar_matches is not None:
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
             walk_time = get_walking_time_string(winner['distance'])
             
-            # 🗺️ Formulate the free browser link for the winner selection
             encoded_winner_query = requests.utils.quote(f"{winner['name']} {winner['address']}")
             winner_maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_winner_query}"
             

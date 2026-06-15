@@ -2,6 +2,43 @@ import streamlit as st
 import requests
 import random
 import math
+import feedparser
+
+def generate_discussion_topic():
+    # 1. Fallback list of evergreen deep/funny topics if news loading fails
+    fallback_topics = [
+        "🔥 SERIOUS: Is corporate loyalty completely dead for our generation, or is job-hopping just a coping mechanism for inflation?",
+        "🤡 FUNNY: If our team was trapped in an elevator for 4 hours, who becomes the leader, who panics first, and who tries to climb through the ceiling?",
+        "🔥 SERIOUS: What is a professional 'hill you are willing to die on' even if a manager disagrees with you?",
+        "🤡 FUNNY: If you could permanently ban one corporate buzzword from all future emails (e.g., 'synergy', 'circle back', 'touch base'), what would it be?",
+        "🔥 SERIOUS: As fresh graduates/interns entering an AI-heavy workforce, are we over-reliant on LLMs, or are older workers just slow to adapt?"
+    ]
+    
+    try:
+        # Fetching live RSS headlines from CNA Singapore News
+        feed = feedparser.parse("https://www.channelnewsasia.com/rssfeeds/8395846") 
+        if feed.entries:
+            # Pick a random live headline from the top 10
+            random_entry = random.choice(feed.entries[:10])
+            title = random_entry.title.lower() # lowercase style choice
+            link = random_entry.link
+            
+            # Templates to spin local news into deep conversation prompts
+            templates = [
+                f"📰 NEWS PROMPT:\nBased on today's headline: '{title}'\n\n💬 DISCUSSION:\nHow do you think this trend realistically impacts fresh grads and interns starting out in the industry over the next 5 years? Is it an overhyped issue or a genuine crisis?",
+                
+                f"📰 NEWS PROMPT:\nLooking at this news: '{title}'\n\n💬 DISCUSSION:\nLet's be real—if you had to solve this specific problem using only $10,000 and a team of unmotivated interns, what is your chaotic masterplan?",
+                
+                f"📰 NEWS PROMPT:\nSeeing this headline today: '{title}'\n\n💬 DISCUSSION:\nDoes this reflect a cultural shift unique to Singapore, or is this just a symptom of modern global life that everyone our age is dealing with?"
+            ]
+            
+            chosen_prompt = random.choice(templates)
+            return f"{chosen_prompt}\n\n🔗 Source: {link}"
+            
+    except Exception:
+        pass # If network is down, immediately proceed to fallback list
+        
+    return random.choice(fallback_topics)
 
 # =====================================================================
 # 1. MOBILE-FIRST UI LAYOUT & DUSTY ROSE PASTEL THEME WITH PINK BG
@@ -134,6 +171,32 @@ if "GOOGLE_API_KEY" in st.secrets:
 else:
     st.error("Missing GOOGLE_API_KEY in secrets configuration.")
     st.stop()
+
+# =====================================================================
+# SIDEBAR FEATURE: INTERN MORNING DISCUSSION GENERATOR
+# =====================================================================
+with st.sidebar:
+    st.markdown("<h2 style='color: #c97a8e;'>☕ morning discussion</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 13px; color: #ca948a;'>generate a morning convo starter based on live sg news.</p>", unsafe_allow_html=True)
+    
+    # Initialize session state for the topic so it doesn't vanish on page rerender
+    if "current_topic" not in st.session_state:
+        st.session_state.current_topic = "click the button below to brew a morning topic!"
+        
+    if st.button("☕ brew discussion topic", use_container_width=True):
+        st.session_state.current_topic = generate_discussion_topic()
+        
+    # Display box for the topic
+    st.markdown(
+        f"""
+        <div style="background-color: #fffafb; border-left: 3px solid #ffccd5; padding: 12px; border-radius: 6px; margin-top: 15px;">
+            <p style="font-size: 13px; color: #5c4d50; white-space: pre-line; line-height: 1.5; font-family: monospace;">
+                {st.session_state.current_topic}
+            </p>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
 
 # =====================================================================
 # 3. UTILITY MODULES: GEOMATH ENGINE & ESTIMATION TRICKS

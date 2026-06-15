@@ -232,10 +232,10 @@ def generate_discussion_topic():
         1. Write a single, brief, direct sentence identifying the core structural or ethical problem behind it. No filler words. Enforce strict lowercase.
         2. Formulate one highly succinct, open-ended debate question for university students. Keep it punchy and short. Enforce strict lowercase.
         
-        Format your response exactly like this template (labels must remain lowercase):
+        Format your response exactly like this template (labels must remain lowercase with distinct spacing):
         📰 headline:
         {headline}
-        
+
         to ponder:
         [Insert the single brief sentence here in all lowercase]
         

@@ -220,26 +220,27 @@ def generate_discussion_topic():
         client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
         
         system_instruction = (
-            "You are an elite academic debate moderator creating icebreakers for brilliant university students. "
-            "Your tone is intellectual, sharp, existential, and slightly witty. No corporate buzzwords or HR talk."
+            "You are an academic debate moderator creating ultra-short icebreakers for university students. "
+            "Your tone is direct, sharp, objective, and clear. Avoid dramatic, flowery, or bombastic language. "
+            "You must strictly use British English spelling (e.g., analyse, behaviour, programme, characterised)."
         )
         
         prompt_payload = f"""
-        Read this real live news headline: "{headline}"
+        Read this headline: "{headline}"
         
         Tasks:
-        1. Write a short 1-sentence analytical summary showing the deeper structural, ethical, or human issue behind this headline.
-        2. Formulate one profound, open-ended, spicy philosophical dilemma question inspired by it that university students would argue about over coffee.
+        1. Write a single, brief, direct sentence identifying the core structural or ethical problem behind it. No filler words.
+        2. Formulate one highly succinct, open-ended debate question for university students. Keep it punchy and short.
         
         Format your response exactly like this template (keep all text lowercase except labels):
         📰 TRENDING TOPIC:
         '{headline.lower()}'
         
         🤔 THE DEEPER DILEMMA:
-        [Insert your 1-sentence analysis here]
+        [Insert the single brief sentence here]
         
         💬 DISCUSSION STARTER:
-        [Insert your deep philosophical debate question here]
+        [Insert the short debate question here]
         """
         
         response = client.models.generate_content(

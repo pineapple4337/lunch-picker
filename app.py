@@ -232,14 +232,14 @@ def generate_discussion_topic():
         1. Write a single, brief, direct sentence identifying the core structural or ethical problem behind it. No filler words.
         2. Formulate one highly succinct, open-ended debate question for university students. Keep it punchy and short.
         
-        Format your response exactly like this template (keep all text lowercase except labels):
-        📰 TRENDING TOPIC:
+        Format your response exactly like this template (keep all text lowercase):
+        📰 headline:
         '{headline.lower()}'
         
-        🤔 THE DEEPER DILEMMA:
+        to ponder:
         [Insert the single brief sentence here]
         
-        💬 DISCUSSION STARTER:
+        question:
         [Insert the short debate question here]
         """
         

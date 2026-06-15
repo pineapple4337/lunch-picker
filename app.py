@@ -203,7 +203,7 @@ def generate_discussion_topic():
     ]
     
     try:
-        feed = feedparser.parse("https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=10416") 
+        feed = feedparser.parse("https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6561") 
         if feed.entries:
             random_entry = random.choice(feed.entries[:10])
             title = random_entry.title.lower()
@@ -455,7 +455,7 @@ if st.session_state.radar_matches is not None:
                 """, unsafe_allow_html=True)
 
 # =====================================================================
-# 7. SIDEBAR FEATURE: UNIVERSITY & ETHICS MORNING TOPIC GENERATOR
+# 7. SIDEBAR FEATURE: MORNING TOPIC GENERATOR
 # =====================================================================
 with st.sidebar:
     st.markdown("<h2 style='color: #c97a8e;'>☕ morning discussion</h2>", unsafe_allow_html=True)

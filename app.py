@@ -4,42 +4,6 @@ import random
 import math
 import feedparser
 
-def generate_discussion_topic():
-    # 1. Fallback list of evergreen deep/funny topics if news loading fails
-    fallback_topics = [
-        "🔥 SERIOUS: Is corporate loyalty completely dead for our generation, or is job-hopping just a coping mechanism for inflation?",
-        "🤡 FUNNY: If our team was trapped in an elevator for 4 hours, who becomes the leader, who panics first, and who tries to climb through the ceiling?",
-        "🔥 SERIOUS: What is a professional 'hill you are willing to die on' even if a manager disagrees with you?",
-        "🤡 FUNNY: If you could permanently ban one corporate buzzword from all future emails (e.g., 'synergy', 'circle back', 'touch base'), what would it be?",
-        "🔥 SERIOUS: As fresh graduates/interns entering an AI-heavy workforce, are we over-reliant on LLMs, or are older workers just slow to adapt?"
-    ]
-    
-    try:
-        # Fetching live RSS headlines from CNA Singapore News
-        feed = feedparser.parse("https://www.channelnewsasia.com/rssfeeds/8395846") 
-        if feed.entries:
-            # Pick a random live headline from the top 10
-            random_entry = random.choice(feed.entries[:10])
-            title = random_entry.title.lower() # lowercase style choice
-            link = random_entry.link
-            
-            # Templates to spin local news into deep conversation prompts
-            templates = [
-                f"📰 NEWS PROMPT:\nBased on today's headline: '{title}'\n\n💬 DISCUSSION:\nHow do you think this trend realistically impacts fresh grads and interns starting out in the industry over the next 5 years? Is it an overhyped issue or a genuine crisis?",
-                
-                f"📰 NEWS PROMPT:\nLooking at this news: '{title}'\n\n💬 DISCUSSION:\nLet's be real—if you had to solve this specific problem using only $10,000 and a team of unmotivated interns, what is your chaotic masterplan?",
-                
-                f"📰 NEWS PROMPT:\nSeeing this headline today: '{title}'\n\n💬 DISCUSSION:\nDoes this reflect a cultural shift unique to Singapore, or is this just a symptom of modern global life that everyone our age is dealing with?"
-            ]
-            
-            chosen_prompt = random.choice(templates)
-            return f"{chosen_prompt}\n\n🔗 Source: {link}"
-            
-    except Exception:
-        pass # If network is down, immediately proceed to fallback list
-        
-    return random.choice(fallback_topics)
-
 # =====================================================================
 # 1. MOBILE-FIRST UI LAYOUT & DUSTY ROSE PASTEL THEME WITH PINK BG
 # =====================================================================
@@ -173,32 +137,6 @@ else:
     st.stop()
 
 # =====================================================================
-# SIDEBAR FEATURE: INTERN MORNING DISCUSSION GENERATOR
-# =====================================================================
-with st.sidebar:
-    st.markdown("<h2 style='color: #c97a8e;'>☕ morning discussion</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size: 13px; color: #ca948a;'>generate a morning convo starter based on live sg news.</p>", unsafe_allow_html=True)
-    
-    # Initialize session state for the topic so it doesn't vanish on page rerender
-    if "current_topic" not in st.session_state:
-        st.session_state.current_topic = "click the button below to brew a morning topic!"
-        
-    if st.button("☕ brew discussion topic", use_container_width=True):
-        st.session_state.current_topic = generate_discussion_topic()
-        
-    # Display box for the topic
-    st.markdown(
-        f"""
-        <div style="background-color: #fffafb; border-left: 3px solid #ffccd5; padding: 12px; border-radius: 6px; margin-top: 15px;">
-            <p style="font-size: 13px; color: #5c4d50; white-space: pre-line; line-height: 1.5; font-family: monospace;">
-                {st.session_state.current_topic}
-            </p>
-        </div>
-        """, 
-        unsafe_allow_html=True
-    )
-
-# =====================================================================
 # 3. UTILITY MODULES: GEOMATH ENGINE & ESTIMATION TRICKS
 # =====================================================================
 def get_custom_coordinates(location_query):
@@ -251,6 +189,42 @@ def get_walking_time_string(distance_meters):
     if minutes <= 1:
         return "~1 min walk"
     return f"~{minutes} mins walk"
+
+
+def generate_discussion_topic():
+    fallback_topics = [
+        "⚖️ ETHICS: If a self-driving car must choose between hitting a group of elderly pedestrians or a single young child, how should the algorithm calculate the value of a life? Who bears moral responsibility?",
+        "🏫 UNI LIFE: Is the modern university system primarily an institution for genuine intellectual growth, or has it just devolved into an expensive, multi-year compliance test to signal capability to employers?",
+        "👁️ SOCIETY: If total global surveillance could permanently eradicate all violent crime overnight at the cost of absolute personal privacy, is that a trade-off a civilized society should accept?",
+        "🧠 ETHICS: If memory-wiping technology existed to perfectly erase traumatic events or painful breakups without physical side effects, is it ethically sound to use it, or do we fundamentally need our pain to remain human?",
+        "🌌 PHILOSOPHY: If humanity successfully builds a conscious, sentient artificial intelligence, should it automatically inherit human rights, or is a machine inherently property regardless of how deeply it can feel?",
+        "🎨 SOCIETY: Has modern social media culture completely killed true counter-cultures and subcultures by instantly commercializing and optimizing every unique human hobby into a mainstream algorithm aesthetic?",
+        "⏳ ETHICS: If life-extension technology allows humans to live healthy lives up to 200 years old, should it be heavily regulated or capped to prevent absolute societal stagnation and catastrophic generational wealth gaps?"
+    ]
+    
+    try:
+        feed = feedparser.parse("https://www.channelnewsasia.com/rssfeeds/8395846") 
+        if feed.entries:
+            random_entry = random.choice(feed.entries[:10])
+            title = random_entry.title.lower()
+            link = random_entry.link
+            
+            templates = [
+                f"📰 NEWS HEADLINE:\n'{title}'\n\n🤔 ETHICAL DILEMMA:\nDoes this situation represent a failure of individual moral responsibility, or is it a systemic issue engineered by modern societal structures? How do we fix it?",
+                
+                f"📰 NEWS HEADLINE:\n'{title}'\n\n💬 DEEP CONVO Starter:\nIf you were tasked to write a university ethics thesis addressing this exact headline, what is the most controversial yet logically defensible stance you could take?",
+                
+                f"📰 NEWS HEADLINE:\n'{title}'\n\n🌍 SOCIETAL VIEWPOINT:\nHow do you think our generation views this specific event compared to our parents' generation? Is there a fundamental shift in core human values happening right here?"
+            ]
+            
+            chosen_prompt = random.choice(templates)
+            return f"{chosen_prompt}\n\n🔗 Source: {link}"
+            
+    except Exception:
+        pass
+        
+    return random.choice(fallback_topics)
+
 
 GOOGLE_TYPE_TRANSLATOR = {
     "japanese_restaurant": "japanese  🍣 🍜 🍱", "sushi_restaurant": "japanese  🍣 🍜 🍱", "ramen_restaurant": "japanese  🍣 🍜 🍱",
@@ -479,3 +453,27 @@ if st.session_state.radar_matches is not None:
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
+
+# =====================================================================
+# 7. SIDEBAR FEATURE: UNIVERSITY & ETHICS MORNING TOPIC GENERATOR
+# =====================================================================
+with st.sidebar:
+    st.markdown("<h2 style='color: #c97a8e;'>☕ discussion lounge</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 13px; color: #ca948a;'>brew a deep conversation starter for the morning.</p>", unsafe_allow_html=True)
+    
+    if "current_topic" not in st.session_state:
+        st.session_state.current_topic = "click the button below to brew a topic!"
+        
+    if st.button("☕ brew morning topic", use_container_width=True):
+        st.session_state.current_topic = generate_discussion_topic()
+        
+    st.markdown(
+        f"""
+        <div style="background-color: #ffffff; border: 1px solid #ffccd5; border-left: 4px solid #c97a8e; padding: 14px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 6px rgba(255, 204, 213, 0.15);">
+            <p style="font-size: 12px; color: #5c4d50; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">
+                {st.session_state.current_topic}
+            </p>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )

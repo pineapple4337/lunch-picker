@@ -243,7 +243,7 @@ def generate_discussion_topic():
         {headline}<br><br>
         to ponder:
         [Insert the single brief sentence here in all lowercase]
-        
+        <br><br>
         question:
         [Insert the short debate question here in all lowercase]
         """

@@ -221,7 +221,7 @@ def generate_discussion_topic():
             return f"{chosen_prompt}\n\n🔗 Source: {link}"
             
     except Exception:
-        pass
+        st.sidebar.error(f"Network error debug info: {e}")
         
     return random.choice(fallback_topics)
 

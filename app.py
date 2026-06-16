@@ -305,8 +305,8 @@ st.write("### 🎯 step 2: any cravings?")
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
 dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
-st.write("### sort by?")
-sort_preference = st.selectbox(options=["distance (nearest first)", "rating (highest first)"])
+
+sort_preference = st.selectbox("how should we arrange the results?", options=["distance (nearest first)", "rating (highest first)"])
 
 # =====================================================================
 # 5. API SEARCH WITH LOGICAL RESPONSE PROCESSING

@@ -305,6 +305,8 @@ st.write("### 🎯 step 2: any cravings?")
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
 dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
+st.write("### sort by?")
+sort_preference = st.selectbox("how should we arrange the results?", options=["distance (nearest first)", "rating (highest first)"])
 
 # =====================================================================
 # 5. API SEARCH WITH LOGICAL RESPONSE PROCESSING
@@ -410,9 +412,18 @@ if st.button("🔍 search!", use_container_width=True):
                     
                 filtered_list.append(item)
                 
-            filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
-            st.session_state.radar_matches = filtered_list
-            
+                if sort_preference == "rating (highest first)":
+                    # places without a valid rating default to 0.0 so they fall to the bottom
+                    filtered_list = sorted(
+                        filtered_list, 
+                        key=lambda x: float(x["rating"]) if isinstance(x["rating"], (int, float)) or (isinstance(x["rating"], str) and x["rating"].replace('.','',1).isdigit()) else 0.0, 
+                        reverse=True
+                    )
+                else:
+                    filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
+                    
+                st.session_state.radar_matches = filtered_list
+
             st.markdown(
                 f'<div style="text-align: center; width: 100%; margin-top: -8px; margin-bottom: 12px; clear: both;">'
                 f'<p style="color: #c97a8e; font-size: 14px; font-weight: 600; margin: 0; display: inline-block; letter-spacing: 0.3px;">'

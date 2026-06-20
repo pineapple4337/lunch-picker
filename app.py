@@ -595,7 +595,7 @@ with st.sidebar:
     if "current_topic" not in st.session_state:
         st.session_state.current_topic = "click the button above for a random topic!"
         
-    if st.button("random topic", use_container_width=True):
+    if st.button("🎲 roll random topic", use_container_width=True):
         st.session_state.current_topic = generate_discussion_topic()
         
     sidebar_bg = "#1a1a1e" if st.session_state.app_theme == "dark" else "#ffffff"

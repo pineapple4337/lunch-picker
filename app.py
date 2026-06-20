@@ -5,124 +5,186 @@ import math
 import feedparser
 
 # =====================================================================
-# 1. MOBILE-FIRST UI LAYOUT & DUSTY ROSE PASTEL THEME WITH PINK BG
+# 1. MOBILE-FIRST UI LAYOUT & DYNAMIC DARK/LIGHT THEME HOOKS
 # =====================================================================
 st.set_page_config(page_title="lunch picker", page_icon="🍟", layout="centered")
 
-st.markdown("""
-    <style>
-        /* Global typography and muted warm dark text */
-        html, body, [data-testid="stWidgetLabel"] p {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            color: #5c4d50 !important;
-        }
-        
-        /* Muted Dusty Rose Header Elements */
-        .app-title {
-            font-size: 34px !important;
-            font-weight: 700 !important;
-            color: #c97a8e !important;
-            margin-bottom: 0px;
-            text-align: center;
-        }
-        
-        .app-subtitle {
-            color: #ca948a;
-            font-size: 14px;
-            font-weight: 400;
-            text-align: center;
-            margin-bottom: 25px;
-            letter-spacing: 0.5px;
-        }
-        
-        /* Soft Pink Tag Pills */
-        .tag-pill {
-            display: inline-block;
-            background-color: #fff5f6;
-            color: #c97a8e;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 500;
-            margin-right: 5px;
-            margin-bottom: 5px;
-            text-transform: lowercase;
-            border: 1px solid #ffccd5;
-        }
-        
-        /* Solid White Choice Container */
-        .winner-box {
-            background-color: #ffffff;
-            border: 1px solid #ffccd5;
-            border-radius: 12px;
-            padding: 22px;
-            margin-bottom: 24px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(255, 204, 213, 0.2);
-        }
-        
-        /* Inline Status Banner Styling - Distinct Pop Out Edition */
-        .status-banner {
-            background-color: #fce1e4;
-            border-left: 5px solid #c97a8e;
-            border-top: 1px solid #f9ccd2;
-            border-right: 1px solid #f9ccd2;
-            border-bottom: 1px solid #f9ccd2;
-            padding: 14px 12px;
-            border-radius: 6px;
-            text-align: center;
-            color: #5c4d50;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 6px rgba(201, 122, 142, 0.1);
-        }
-        
-        /* Expansion result cards styling */
-        div[data-testid="stExpander"] {
-            background-color: #ffffff !important;
-            border: 1px solid #fff0f1 !important;
-            border-radius: 12px !important;
-            box-shadow: 0 2px 8px rgba(255, 204, 213, 0.15) !important;
-            margin-bottom: 8px !important;
-        }
-        
-        /* COHESIVE SOLID PINK BUTTON STYLES */
-        div.stButton > button:first-child, 
-        div[data-testid="stFormSubmitButton"] > button {
-            background-color: #fff0f1 !important;
-            color: #c97a8e !important;
-            border: 1px solid #ffccd5 !important;
-            padding: 10px 20px !important;
-            border-radius: 10px !important;
-            font-weight: 600 !important;
-            transition: all 0.2s ease !important;
-            width: 100%;
-        }
-        
-        div.stBlock:has(div.winner-box) + div.stButton > button,
-        .stButton:nth-of-type(2) > button, 
-        div[data-testid="element-container"] + div.stButton > button {
-            background-color: #fce1e4 !important;
-            color: #c97a8e !important;
-            border: 1px solid #f9ccd2 !important;
-        }
-        
-        .stButton>button:hover {
-            transform: translateY(-1px) !important;
-            opacity: 0.9 !important;
-        }
-        
-        /* Forces expander titles to respect string line breaks beautifully on mobile viewports */
-        div[data-testid="stExpander"] summary p {
-            white-space: pre-line !important;
-            line-height: 1.4 !important;
-            padding-top: 4px !important;
-            padding-bottom: 4px !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
+# Initialize theme state early in the execution cycle
+if "app_theme" not in st.session_state:
+    st.session_state.app_theme = "light"
+
+if st.session_state.app_theme == "dark":
+    st.markdown("""
+        <style>
+            /* Global typography and dark-mode neutral canvas */
+            html, body, [data-testid="stAppViewContainer"], [data-testid="stWidgetLabel"] p {
+                background-color: #1e1a1b !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+                color: #e0d5d6 !important;
+            }
+            
+            /* Sidebar layout tracking cohesive dark values */
+            [data-testid="stSidebar"], [data-testid="stSidebarUserContent"] {
+                background-color: #2a2325 !important;
+            }
+            
+            .app-title {
+                font-size: 34px !important;
+                font-weight: 700 !important;
+                color: #ffb3c6 !important;
+                margin-bottom: 0px;
+                text-align: center;
+            }
+            
+            .app-subtitle {
+                color: #e2b3aa;
+                font-size: 14px;
+                font-weight: 400;
+                text-align: center;
+                margin-bottom: 25px;
+                letter-spacing: 0.5px;
+            }
+            
+            .tag-pill {
+                display: inline-block;
+                background-color: #3d3033;
+                color: #ffb3c6;
+                padding: 3px 10px;
+                border-radius: 20px;
+                font-size: 11px;
+                font-weight: 500;
+                margin-right: 5px;
+                margin-bottom: 5px;
+                text-transform: lowercase;
+                border: 1px solid #5c4448;
+            }
+            
+            .winner-box {
+                background-color: #2a2325;
+                border: 1px solid #4a3b3e;
+                border-radius: 12px;
+                padding: 22px;
+                margin-bottom: 24px;
+                text-align: center;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            }
+            
+            div[data-testid="stExpander"] {
+                background-color: #2a2325 !important;
+                border: 1px solid #4a3b3e !important;
+                border-radius: 12px !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+                margin-bottom: 8px !important;
+            }
+            
+            div.stButton > button:first-child, 
+            div[data-testid="stFormSubmitButton"] > button {
+                background-color: #3d3033 !important;
+                color: #ffb3c6 !important;
+                border: 1px solid #5c4448 !important;
+                padding: 10px 20px !important;
+                border-radius: 10px !important;
+                font-weight: 600 !important;
+                transition: all 0.2s ease !important;
+                width: 100%;
+            }
+            
+            .stButton>button:hover {
+                transform: translateY(-1px) !important;
+                opacity: 0.9 !important;
+            }
+            
+            div[data-testid="stExpander"] summary p {
+                white-space: pre-line !important;
+                line-height: 1.4 !important;
+                padding-top: 4px !important;
+                padding-bottom: 4px !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+        <style>
+            /* Global typography and muted warm dark text */
+            html, body, [data-testid="stWidgetLabel"] p {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+                color: #5c4d50 !important;
+            }
+            
+            .app-title {
+                font-size: 34px !important;
+                font-weight: 700 !important;
+                color: #c97a8e !important;
+                margin-bottom: 0px;
+                text-align: center;
+            }
+            
+            .app-subtitle {
+                color: #ca948a;
+                font-size: 14px;
+                font-weight: 400;
+                text-align: center;
+                margin-bottom: 25px;
+                letter-spacing: 0.5px;
+            }
+            
+            .tag-pill {
+                display: inline-block;
+                background-color: #fff5f6;
+                color: #c97a8e;
+                padding: 3px 10px;
+                border-radius: 20px;
+                font-size: 11px;
+                font-weight: 500;
+                margin-right: 5px;
+                margin-bottom: 5px;
+                text-transform: lowercase;
+                border: 1px solid #ffccd5;
+            }
+            
+            .winner-box {
+                background-color: #ffffff;
+                border: 1px solid #ffccd5;
+                border-radius: 12px;
+                padding: 22px;
+                margin-bottom: 24px;
+                text-align: center;
+                box-shadow: 0 4px 12px rgba(255, 204, 213, 0.2);
+            }
+            
+            div[data-testid="stExpander"] {
+                background-color: #ffffff !important;
+                border: 1px solid #fff0f1 !important;
+                border-radius: 12px !important;
+                box-shadow: 0 2px 8px rgba(255, 204, 213, 0.15) !important;
+                margin-bottom: 8px !important;
+            }
+            
+            div.stButton > button:first-child, 
+            div[data-testid="stFormSubmitButton"] > button {
+                background-color: #fff0f1 !important;
+                color: #c97a8e !important;
+                border: 1px solid #ffccd5 !important;
+                padding: 10px 20px !important;
+                border-radius: 10px !important;
+                font-weight: 600 !important;
+                transition: all 0.2s ease !important;
+                width: 100%;
+            }
+            
+            .stButton>button:hover {
+                transform: translateY(-1px) !important;
+                opacity: 0.9 !important;
+            }
+            
+            div[data-testid="stExpander"] summary p {
+                white-space: pre-line !important;
+                line-height: 1.4 !important;
+                padding-top: 4px !important;
+                padding-bottom: 4px !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
 st.markdown('<p class="app-title">🍟 lunch picker</p>', unsafe_allow_html=True)
 st.markdown('<p class="app-subtitle">what to eat!!!</p>', unsafe_allow_html=True)
@@ -193,10 +255,10 @@ def get_walking_time_string(distance_meters):
 
 def generate_discussion_topic():
     fallback_topics = [
-        "If a self-driving car must choose between hitting a group of elderly pedestrians or a single young child, how should the algorithm calculate the value of a life? Who bears moral responsibility?",
-        "Is the modern university system primarily an institution for genuine intellectual growth, or has it just devolved into an expensive, multi-year compliance test to signal capability to employers?",
-        "If total global surveillance could permanently eradicate all violent crime overnight at the cost of absolute personal privacy, is that a trade-off a civilized society should accept?",
-        "If memory-wiping technology existed to perfectly erase traumatic events or painful breakups without physical side effects, is it ethically sound to use it, or do we fundamentally need our pain to remain human?"
+        "If a self-driving car must choose between hitting a group of elderly pedestrians or a single young child, how should the algorithm calculate the value of a life? Who bears moral responsibility.",
+        "Is the modern university system primarily an institution for genuine intellectual growth, or has it just devolved into an expensive, multi-year compliance test to signal capability to employers.",
+        "If total global surveillance could permanently eradicate all violent crime overnight at the cost of absolute personal privacy, is that a trade-off a civilized society should accept.",
+        "If memory-wiping technology existed to perfectly erase traumatic events or painful breakups without physical side effects, is it ethically sound to use it, or do we fundamentally need our pain to remain human."
     ]
     
     try:
@@ -205,7 +267,6 @@ def generate_discussion_topic():
         return random.choice(fallback_topics)
         
     try:
-        # Pull from the standard primary outbound top stories feed which always stays functional
         feed = feedparser.parse("https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=10416")
         if not feed.entries:
             return random.choice(fallback_topics)
@@ -218,12 +279,6 @@ def generate_discussion_topic():
             return f"⚠️ Missing GEMINI_API_KEY in Streamlit Secrets!\n\nFound Headline: '{headline}'"
             
         client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
-        
-        system_instruction = (
-            "You are an academic debate moderator creating ultra-short icebreakers for university students. "
-            "Your tone is direct, sharp, objective, and clear. Avoid dramatic, flowery, or bombastic language. "
-            "You must strictly use British English spelling (e.g., analyse, behaviour, programme, characterised)."
-        )
         
         system_instruction = (
             "You are an academic debate moderator creating ultra-short icebreakers for university students. "
@@ -246,7 +301,6 @@ def generate_discussion_topic():
         <br><br>
         question:
         [Insert the short debate question here in all lowercase]
-        <br><br>
         """
         
         response = client.models.generate_content(
@@ -257,7 +311,7 @@ def generate_discussion_topic():
         
         if response.text:
             cleaned_text = response.text.replace("---", "\n")
-            return f"{cleaned_text.strip()}\n\n🔗 Source: {article_link}"
+            return f"{cleaned_text.strip()}\n\n<br><br>🔗 Source: {article_link}"
             
     except Exception as e:
         st.sidebar.caption(f"🔧 debug diagnostic flag: {e}")
@@ -292,8 +346,6 @@ if "radar_matches" not in st.session_state:
     st.session_state.radar_matches = None
 if "executed_vibe" not in st.session_state:
     st.session_state.executed_vibe = ""
-if "show_inline_banner" not in st.session_state:
-    st.session_state.show_inline_banner = False
 
 # =====================================================================
 # 4. MOBILE INTERACTIVE CONTROLS
@@ -306,7 +358,8 @@ unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
 dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
 
-sort_preference = st.selectbox("sort by:", options=["distance (nearest first)", "rating (highest first)"])
+# Box only implementation for sorting layout
+sort_preference = st.selectbox("how should we arrange the results?", options=["distance (nearest first)", "rating (highest first)"])
 
 # =====================================================================
 # 5. API SEARCH WITH LOGICAL RESPONSE PROCESSING
@@ -412,18 +465,18 @@ if st.button("🔍 search!", use_container_width=True):
                     
                 filtered_list.append(item)
                 
-                if sort_preference == "rating (highest first)":
-                    # places without a valid rating default to 0.0 so they fall to the bottom
-                    filtered_list = sorted(
-                        filtered_list, 
-                        key=lambda x: float(x["rating"]) if isinstance(x["rating"], (int, float)) or (isinstance(x["rating"], str) and x["rating"].replace('.','',1).isdigit()) else 0.0, 
-                        reverse=True
-                    )
-                else:
-                    filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
-                    
-                st.session_state.radar_matches = filtered_list
-
+            # Rating sorting matrix execution filter
+            if sort_preference == "rating (highest first)":
+                filtered_list = sorted(
+                    filtered_list, 
+                    key=lambda x: float(x["rating"]) if isinstance(x["rating"], (int, float)) or (isinstance(x["rating"], str) and x["rating"].replace('.','',1).isdigit()) else 0.0, 
+                    reverse=True
+                )
+            else:
+                filtered_list = sorted(filtered_list, key=lambda x: x["distance"])
+                
+            st.session_state.radar_matches = filtered_list
+            
             st.markdown(
                 f'<div style="text-align: center; width: 100%; margin-top: -8px; margin-bottom: 12px; clear: both;">'
                 f'<p style="color: #c97a8e; font-size: 14px; font-weight: 600; margin: 0; display: inline-block; letter-spacing: 0.3px;">'
@@ -502,10 +555,20 @@ if st.session_state.radar_matches is not None:
                 """, unsafe_allow_html=True)
 
 # =====================================================================
-# 7. SIDEBAR FEATURE: MORNING TOPIC GENERATOR
+# 7. SIDEBAR FEATURE: MORNING TOPIC GENERATOR & GLOBAL CONTROLS
 # =====================================================================
 with st.sidebar:
-    st.markdown("<h2 style='color: #c97a8e;'>☀️ morning discussion</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #c97a8e;'>⚙️ settings</h2>", unsafe_allow_html=True)
+    
+    # Theme configuration interface
+    is_dark_active = st.toggle("🌙 enable dark mode", value=(st.session_state.app_theme == "dark"))
+    new_theme = "dark" if is_dark_active else "light"
+    
+    if new_theme != st.session_state.app_theme:
+        st.session_state.app_theme = new_theme
+        st.rerun()
+        
+    st.markdown("<h2 style='color: #c97a8e; margin-top: 20px;'>☀️ morning discussion</h2>", unsafe_allow_html=True)
     
     if "current_topic" not in st.session_state:
         st.session_state.current_topic = "click the button above for a random topic!"
@@ -515,7 +578,11 @@ with st.sidebar:
         
     st.markdown(
         f"""
-        <div style="background-color: #ffffff; border: 1px solid #ffccd5; border-left: 4px solid #c97a8e; padding: 14px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 6px rgba(255, 204, 213, 0.15); font-size: 13px; color: #5c4d50; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">
+        <div style="background-color: {"#2a2325" if st.session_state.app_theme == "dark" else "#ffffff"}; 
+                    border: 1px solid {"#4a3b3e" if st.session_state.app_theme == "dark" else "#ffccd5"}; 
+                    border-left: 4px solid #c97a8e; padding: 14px; border-radius: 8px; margin-top: 15px; 
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-size: 13px; 
+                    color: {"#e0d5d6" if st.session_state.app_theme == "dark" else "#5c4d50"}; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">
             {st.session_state.current_topic}
         </div>
         """, 

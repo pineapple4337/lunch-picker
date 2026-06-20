@@ -604,13 +604,6 @@ with st.sidebar:
     sidebar_txt = "#e3e3e6" if st.session_state.app_theme == "dark" else "#880D1E"
     
     st.markdown(
-        f"""
-        <div style="background-color: {sidebar_bg}; border: 1px solid {sidebar_border}; 
-                    border-left: 4px solid {sidebar_left_border}; padding: 14px; border-radius: 8px; margin-top: 15px; 
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-size: 13px; 
-                    color: {sidebar_txt}; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">
-            {st.session_state.current_topic}
-        </div>
-        """, 
+        f"""<div style="background-color: #ffffff; border: 1px solid #ffccd5; border-left: 4px solid #c97a8e; padding: 14px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 6px rgba(255, 204, 213, 0.15); font-size: 13px; color: #5c4d50; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">{st.session_state.current_topic}</div>""", 
         unsafe_allow_html=True
     )

@@ -507,7 +507,7 @@ if st.session_state.radar_matches is not None:
     if len(st.session_state.radar_matches) == 0:
         st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within parameters")
     else:
-        if st.button("🎲 roll random selection", use_container_width=True):
+        if st.button("🎲 anything...", use_container_width=True):
             winner = random.choice(st.session_state.radar_matches)
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
             walk_time = get_walking_time_string(winner['distance'])

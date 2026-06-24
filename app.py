@@ -366,7 +366,7 @@ starting_point = st.text_input("enter current location (e.g. bugis, chinatown)",
 
 st.write("### 🎯 step 2: any cravings?")
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
-dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
+dropdown_options = unique_display_tags + ["🎲 anything... (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
 
 sort_preference = st.selectbox("sort by:", options=["distance (nearest first)", "rating (highest first)"])
@@ -386,7 +386,7 @@ if st.button("🔍 search!", use_container_width=True):
             "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types,places.location"
         }
         
-        if selected_vibe == "🎲 surprise me! (random category)":
+        if selected_vibe == "🎲 anything... (random category)":
             target_vibe = random.choice(unique_display_tags)
         else:
             target_vibe = selected_vibe

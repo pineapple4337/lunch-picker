@@ -511,7 +511,7 @@ if st.session_state.radar_matches is not None:
             winner_maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_winner_query}"
             
             text_color = "#e2e2e9" if st.session_state.app_theme == "dark" else "#2c3e50"
-            sub_color = "#a4937d" if st.session_state.app_theme == "dark" else #4a5568"
+            sub_color = "#a4937d" if st.session_state.app_theme == "dark" else "#4a5568"
             inner_bg = "#16161a" if st.session_state.app_theme == "dark" else "#f7fafc"
             inner_border = "#3a3a42" if st.session_state.app_theme == "dark" else "#e2e8f0"
             
@@ -598,5 +598,4 @@ with st.sidebar:
     sidebar_left_border = "#d4af37" if st.session_state.app_theme == "dark" else "#1e3f20"
     sidebar_txt = "#e2e2e9" if st.session_state.app_theme == "dark" else "#2c3e50"
     
-    # Also retained the dynamic line fix we completed previously to prevent unwanted top space gaps
     st.markdown(f"""<div style="background-color: {sidebar_bg}; border: 1px solid {sidebar_border}; border-left: 4px solid {sidebar_left_border}; padding: 14px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-size: 13px; color: {sidebar_txt}; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">{st.session_state.current_topic}</div>""", unsafe_allow_html=True)

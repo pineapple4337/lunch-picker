@@ -16,85 +16,84 @@ if "app_theme" not in st.session_state:
 if st.session_state.app_theme == "dark":
     st.markdown("""
         <style>
-            /* Global typography and dark-mode canvas */
+            /* Global typography and clean classy dark-mode canvas */
             html, body, [data-testid="stAppViewContainer"], [data-testid="stWidgetLabel"] p {
-                background-color: #121214 !important;
+                background-color: #16161a !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-                color: #e3e3e6 !important;
+                color: #e2e2e9 !important;
             }
             
-            /* Sidebar layout tracking dark values */
+            /* Sidebar layout tracking clean dark values */
             [data-testid="stSidebar"], [data-testid="stSidebarUserContent"] {
-                background-color: #1a1a1e !important;
+                background-color: #0f0f12 !important;
             }
             
-            /* Main Color: #5ce6a9 */
+            /* Main Classy Color: Champagne Gold */
             .app-title {
                 font-size: 34px !important;
                 font-weight: 700 !important;
-                color: #5ce6a9 !important;
+                color: #d4af37 !important;
                 margin-bottom: 0px;
                 text-align: center;
+                letter-spacing: -0.5px;
             }
             
-            /* Info Accent: #87d1ff */
+            /* Subdued Muted Gold / Ivory */
             .app-subtitle {
-                color: #87d1ff;
+                color: #a4937d;
                 font-size: 14px;
                 font-weight: 400;
                 text-align: center;
                 margin-bottom: 25px;
-                letter-spacing: 0.5px;
+                letter-spacing: 1px;
             }
             
             .tag-pill {
                 display: inline-block;
-                background-color: #1c2e26;
-                color: #5ce6a9;
+                background-color: #222227;
+                color: #d4af37;
                 padding: 3px 10px;
-                border-radius: 20px;
+                border-radius: 4px;
                 font-size: 11px;
                 font-weight: 500;
                 margin-right: 5px;
                 margin-bottom: 5px;
                 text-transform: lowercase;
-                border: 1px solid #28543e;
+                border: 1px solid #3a3a42;
             }
             
             .winner-box {
-                background-color: #1a1a1e;
-                border: 1px solid #28543e;
-                border-radius: 12px;
+                background-color: #1f1f24;
+                border: 1px solid #d4af37;
+                border-radius: 8px;
                 padding: 22px;
                 margin-bottom: 24px;
                 text-align: center;
-                box-shadow: 0 4px 12px rgba(92, 230, 169, 0.15);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             }
             
             div[data-testid="stExpander"] {
-                background-color: #1a1a1e !important;
+                background-color: #1f1f24 !important;
                 border: 1px solid #2c2c35 !important;
-                border-radius: 12px !important;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+                border-radius: 8px !important;
                 margin-bottom: 8px !important;
             }
             
             div.stButton > button:first-child, 
             div[data-testid="stFormSubmitButton"] > button {
-                background-color: #1c2e26 !important;
-                color: #5ce6a9 !important;
-                border: 1px solid #5ce6a9 !important;
+                background-color: #222227 !important;
+                color: #d4af37 !important;
+                border: 1px solid #d4af37 !important;
                 padding: 10px 20px !important;
-                border-radius: 10px !important;
+                border-radius: 6px !important;
                 font-weight: 600 !important;
                 transition: all 0.2s ease !important;
                 width: 100%;
             }
             
-            /* Warning Accent: #ffbc5e */
             .stButton>button:hover {
-                border-color: #ffbc5e !important;
-                color: #ffbc5e !important;
+                background-color: #d4af37 !important;
+                color: #16161a !important;
                 transform: translateY(-1px) !important;
             }
             
@@ -109,81 +108,78 @@ if st.session_state.app_theme == "dark":
 else:
     st.markdown("""
         <style>
-            /* Global typography and light-mode text */
+            /* Global typography and classy warm text */
             html, body, [data-testid=\"stWidgetLabel\"] p {
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-                color: #880D1E !important; /* Dark Burgundy accent for body text readability */
+                color: #2c3e50 !important; 
             }
             
-            /* Main Color: #F26A8D */
+            /* Main Classy Color: Deep Forest Green / Emerald */
             .app-title {
                 font-size: 34px !important;
                 font-weight: 700 !important;
-                color: #F26A8D !important;
+                color: #1e3f20 !important;
                 margin-bottom: 0px;
                 text-align: center;
+                letter-spacing: -0.5px;
             }
             
-            /* Accent: #DD2D4A */
+            /* Subdued Slate Accent */
             .app-subtitle {
-                color: #DD2D4A;
+                color: #4a5568;
                 font-size: 14px;
                 font-weight: 400;
                 text-align: center;
                 margin-bottom: 25px;
-                letter-spacing: 0.5px;
+                letter-spacing: 1px;
             }
             
-            /* Accent Pill: #F49CBB */
             .tag-pill {
                 display: inline-block;
-                background-color: #fff0f4;
-                color: #F26A8D;
+                background-color: #f7fafc;
+                color: #1e3f20;
                 padding: 3px 10px;
-                border-radius: 20px;
+                border-radius: 4px;
                 font-size: 11px;
                 font-weight: 500;
                 margin-right: 5px;
                 margin-bottom: 5px;
                 text-transform: lowercase;
-                border: 1px solid #F49CBB;
+                border: 1px solid #e2e8f0;
             }
             
-            /* Accent Card Fill: #CBEEF3 */
             .winner-box {
                 background-color: #ffffff;
-                border: 2px solid #CBEEF3;
-                border-radius: 12px;
+                border: 1px solid #1e3f20;
+                border-radius: 8px;
                 padding: 22px;
                 margin-bottom: 24px;
                 text-align: center;
-                box-shadow: 0 4px 12px rgba(203, 238, 243, 0.5);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             }
             
             div[data-testid="stExpander"] {
                 background-color: #ffffff !important;
-                border: 1px solid #fff0f4 !important;
-                border-radius: 12px !important;
-                box-shadow: 0 2px 8px rgba(244, 156, 187, 0.15) !important;
+                border: 1px solid #e2e8f0 !important;
+                border-radius: 8px !important;
                 margin-bottom: 8px !important;
             }
             
             div.stButton > button:first-child, 
             div[data-testid="stFormSubmitButton"] > button {
-                background-color: #fff0f4 !important;
-                color: #F26A8D !important;
-                border: 1px solid #F49CBB !important;
+                background-color: #ffffff !important;
+                color: #1e3f20 !important;
+                border: 1px solid #1e3f20 !important;
                 padding: 10px 20px !important;
-                border-radius: 10px !important;
+                border-radius: 6px !important;
                 font-weight: 600 !important;
                 transition: all 0.2s ease !important;
                 width: 100%;
             }
             
             .stButton>button:hover {
-                background-color: #CBEEF3 !important;
-                border-color: #F26A8D !important;
-                color: #880D1E !important;
+                background-color: #1e3f20 !important;
+                color: #ffffff !important;
                 transform: translateY(-1px) !important;
             }
             
@@ -366,7 +362,7 @@ starting_point = st.text_input("enter current location (e.g. bugis, chinatown)",
 
 st.write("### 🎯 step 2: any cravings?")
 unique_display_tags = sorted(list(set(GOOGLE_TYPE_TRANSLATOR.values())))
-dropdown_options = unique_display_tags + ["🎲 anything... (random category)"]
+dropdown_options = unique_display_tags + ["🎲 surprise me! (random category)"]
 selected_vibe = st.selectbox("what kinda meal are we looking for?", options=dropdown_options)
 
 sort_preference = st.selectbox("sort by:", options=["distance (nearest first)", "rating (highest first)"])
@@ -386,7 +382,7 @@ if st.button("🔍 search!", use_container_width=True):
             "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.regularOpeningHours,places.types,places.location"
         }
         
-        if selected_vibe == "🎲 anything... (random category)":
+        if selected_vibe == "🎲 surprise me! (random category)":
             target_vibe = random.choice(unique_display_tags)
         else:
             target_vibe = selected_vibe
@@ -475,7 +471,6 @@ if st.button("🔍 search!", use_container_width=True):
                     
                 filtered_list.append(item)
                 
-            # Executing proper listing alignment Matrix blocks
             if sort_preference == "rating (highest first)":
                 filtered_list = sorted(
                     filtered_list, 
@@ -487,7 +482,7 @@ if st.button("🔍 search!", use_container_width=True):
                 
             st.session_state.radar_matches = filtered_list
             
-            accent_color = "#5ce6a9" if st.session_state.app_theme == "dark" else "#F26A8D"
+            accent_color = "#d4af37" if st.session_state.app_theme == "dark" else "#1e3f20"
             st.markdown(
                 f'<div style="text-align: center; width: 100%; margin-top: -8px; margin-bottom: 12px; clear: both;">'
                 f'<p style="color: {accent_color}; font-size: 14px; font-weight: 600; margin: 0; display: inline-block; letter-spacing: 0.3px;">'
@@ -507,7 +502,7 @@ if st.session_state.radar_matches is not None:
     if len(st.session_state.radar_matches) == 0:
         st.warning(f"no spots matching '{st.session_state.executed_vibe}' found within parameters")
     else:
-        if st.button("🎲 anything...", use_container_width=True):
+        if st.button("🎲 roll random selection", use_container_width=True):
             winner = random.choice(st.session_state.radar_matches)
             tag_pills = "".join([f'<span class="tag-pill">{t}</span>' for t in winner["tags"]])
             walk_time = get_walking_time_string(winner['distance'])
@@ -515,20 +510,20 @@ if st.session_state.radar_matches is not None:
             encoded_winner_query = requests.utils.quote(f"{winner['name']} {winner['address']}")
             winner_maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_winner_query}"
             
-            text_color = "#e3e3e6" if st.session_state.app_theme == "dark" else "#880D1E"
-            sub_color = "#87d1ff" if st.session_state.app_theme == "dark" else "#DD2D4A"
-            inner_bg = "#121214" if st.session_state.app_theme == "dark" else "#fff0f4"
-            inner_border = "#2c2c35" if st.session_state.app_theme == "dark" else "#F49CBB"
+            text_color = "#e2e2e9" if st.session_state.app_theme == "dark" else "#2c3e50"
+            sub_color = "#a4937d" if st.session_state.app_theme == "dark" else #4a5568"
+            inner_bg = "#16161a" if st.session_state.app_theme == "dark" else "#f7fafc"
+            inner_border = "#3a3a42" if st.session_state.app_theme == "dark" else "#e2e8f0"
             
             st.markdown(f"""
                 <div class="winner-box">
-                    <p style="color: {"#5ce6a9" if st.session_state.app_theme == "dark" else "#F26A8D"}; font-weight: 700; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">✨ chosen option!</p>
+                    <p style="color: {"#d4af37" if st.session_state.app_theme == "dark" else "#1e3f20"}; font-weight: 700; font-size: 14px; margin: 0 0 4px 0; letter-spacing: 1px; text-transform: lowercase;">✨ chosen option!</p>
                     <p class="restaurant-name" style="font-size: 24px !important; color: {text_color}; font-weight:700;">{winner['name'].lower()}</p>
                     <p style="margin: 8px 0;">{tag_pills}</p>
                     <p style="font-size: 14px; color: {sub_color}; margin: 0;"><b>dist:</b> {winner['distance']}m ({walk_time}) | <b>rating:</b> {winner['rating']} ⭐ | <b>price:</b> {winner['price_tier']}</p>
                     <p style="font-size: 12px; color: {sub_color}; margin-top: 5px;"><b>status:</b> {winner['status']}</p>
                     <div style="background-color: {inner_bg}; border: 1px dashed {inner_border}; padding: 10px; border-radius: 6px; margin-top: 10px; position: relative;">
-                        <p style="font-size: 11px; color: {"#5ce6a9" if st.session_state.app_theme == "dark" else "#F26A8D"}; margin: 0 0 4px 0; font-family: monospace;">📍 {winner['address'].lower()}</p>
+                        <p style="font-size: 11px; color: {"#d4af37" if st.session_state.app_theme == "dark" else "#1e3f20"}; margin: 0 0 4px 0; font-family: monospace;">📍 {winner['address'].lower()}</p>
                         <a href="{winner_maps_url}" target="_blank" style="font-size: 11px; color: {sub_color}; font-weight: 600; text-decoration: underline; display: inline-block; margin-top: 2px;">
                             🗺️ view on google maps
                         </a>
@@ -536,7 +531,7 @@ if st.session_state.radar_matches is not None:
                 </div>
             """, unsafe_allow_html=True)
             
-        title_color = "#5ce6a9" if st.session_state.app_theme == "dark" else "#F26A8D"
+        title_color = "#d4af37" if st.session_state.app_theme == "dark" else "#1e3f20"
         st.markdown(f'<h3 style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: {title_color};">📋 {st.session_state.executed_vibe} results ({len(st.session_state.radar_matches)})</h3>', unsafe_allow_html=True)
         
         for spot in st.session_state.radar_matches:
@@ -552,10 +547,10 @@ if st.session_state.radar_matches is not None:
                 encoded_query = requests.utils.quote(f"{spot['name']} {spot['address']}")
                 maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_query}"
                 
-                sub_color = "#87d1ff" if st.session_state.app_theme == "dark" else "#DD2D4A"
-                label_color = "#5ce6a9" if st.session_state.app_theme == "dark" else "#F26A8D"
-                inner_bg = "#121214" if st.session_state.app_theme == "dark" else "#fff0f4"
-                inner_border = "#2c2c35" if st.session_state.app_theme == "dark" else "#F49CBB"
+                sub_color = "#a4937d" if st.session_state.app_theme == "dark" else "#4a5568"
+                label_color = "#d4af37" if st.session_state.app_theme == "dark" else "#1e3f20"
+                inner_bg = "#16161a" if st.session_state.app_theme == "dark" else "#f7fafc"
+                inner_border = "#3a3a42" if st.session_state.app_theme == "dark" else "#e2e8f0"
                 
                 st.markdown(f"""
                     <div style="padding: 5px 0px;">
@@ -580,7 +575,7 @@ if st.session_state.radar_matches is not None:
 # 7. SIDEBAR FEATURE: MORNING TOPIC GENERATOR & GLOBAL CONTROLS
 # =====================================================================
 with st.sidebar:
-    st.markdown(f"<h2 style='color: {"#5ce6a9" if st.session_state.app_theme == "dark" else "#F26A8D"};'>⚙️ settings</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='color: {"#d4af37" if st.session_state.app_theme == "dark" else "#1e3f20"};'>⚙️ settings</h2>", unsafe_allow_html=True)
     
     # Theme configuration interface toggler
     is_dark_active = st.toggle("🌙 enable dark mode", value=(st.session_state.app_theme == "dark"))
@@ -590,20 +585,18 @@ with st.sidebar:
         st.session_state.app_theme = new_theme
         st.rerun()
         
-    st.markdown(f"<h2 style='color: {"#5ce6a9" if st.session_state.app_theme == "dark" else "#F26A8D"}; margin-top: 20px;'>☀️ morning discussion</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='color: {"#d4af37" if st.session_state.app_theme == "dark" else "#1e3f20"}; margin-top: 20px;'>☀️ morning discussion</h2>", unsafe_allow_html=True)
     
     if "current_topic" not in st.session_state:
         st.session_state.current_topic = "click the button above for a random topic!"
         
-    if st.button("🎲 roll random topic", use_container_width=True):
+    if st.button("random morning topic", use_container_width=True):
         st.session_state.current_topic = generate_discussion_topic()
         
-    sidebar_bg = "#1a1a1e" if st.session_state.app_theme == "dark" else "#ffffff"
-    sidebar_border = "#28543e" if st.session_state.app_theme == "dark" else "#CBEEF3"
-    sidebar_left_border = "#5ce6a9" if st.session_state.app_theme == "dark" else "#F26A8D"
-    sidebar_txt = "#e3e3e6" if st.session_state.app_theme == "dark" else "#880D1E"
+    sidebar_bg = "#0f0f12" if st.session_state.app_theme == "dark" else "#ffffff"
+    sidebar_border = "#222227" if st.session_state.app_theme == "dark" else "#e2e8f0"
+    sidebar_left_border = "#d4af37" if st.session_state.app_theme == "dark" else "#1e3f20"
+    sidebar_txt = "#e2e2e9" if st.session_state.app_theme == "dark" else "#2c3e50"
     
-    st.markdown(
-        f"""<div style="background-color: #ffffff; border: 1px solid #ffccd5; border-left: 4px solid #c97a8e; padding: 14px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 6px rgba(255, 204, 213, 0.15); font-size: 13px; color: #5c4d50; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">{st.session_state.current_topic}</div>""", 
-        unsafe_allow_html=True
-    )
+    # Also retained the dynamic line fix we completed previously to prevent unwanted top space gaps
+    st.markdown(f"""<div style="background-color: {sidebar_bg}; border: 1px solid {sidebar_border}; border-left: 4px solid {sidebar_left_border}; padding: 14px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-size: 13px; color: {sidebar_txt}; white-space: pre-line; line-height: 1.6; font-family: -apple-system, sans-serif;">{st.session_state.current_topic}</div>""", unsafe_allow_html=True)
